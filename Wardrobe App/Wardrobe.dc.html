@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+  *{box-sizing:border-box;}
+  ::-webkit-scrollbar{display:none;width:0;height:0;}
+  input{-webkit-appearance:none;appearance:none;}
+  @keyframes toastIn{from{opacity:0;transform:translate(-50%,10px);}to{opacity:1;transform:translate(-50%,0);}}
+  @keyframes sheetIn{from{transform:translateY(100%);}to{transform:translateY(0);}}
+  @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+</style>
+</helmet>
+<x-import component="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+  <div style="height:100%;display:flex;flex-direction:column;background:#FAFAFA;font-family:-apple-system,system-ui,'Helvetica Neue',sans-serif;color:#17171B;-webkit-font-smoothing:antialiased;position:relative;overflow:hidden;">
+
+    <!-- HEADER -->
+    <div style="flex:none;padding:58px 20px 6px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;background:#FAFAFA;">
+      <div style="min-width:0;">
+        <div style="font-size:31px;font-weight:700;letter-spacing:-0.025em;line-height:1.04;">{{ headerTitle }}</div>
+      </div>
+      <sc-if value="{{ headerBtnShow }}" hint-placeholder-val="{{ false }}">
+        <div onClick="{{ headerBtnClick }}" style="flex:none;margin-top:-1px;padding:8px 17px;border-radius:9999px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;background:{{ headerBtnBg }};color:{{ headerBtnColor }};border:0.5px solid {{ headerBtnBorder }};">{{ headerBtnLabel }}</div>
+      </sc-if>
+    </div>
+
+    <!-- MAIN SCROLL -->
+    <div style="flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;">
+
+      <!-- ============ CLOSET ============ -->
+      <sc-if value="{{ isCloset }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:0 0 24px;">
+        <div style="position:sticky;top:0;z-index:22;background:#FAFAFA;">
+        <div style="display:flex;gap:8px;overflow-x:auto;padding:8px 20px 8px;">
+          <sc-for list="{{ groups }}" as="g" hint-placeholder-count="6">
+            <div onClick="{{ g.onClick }}" style="flex:none;padding:7px 14px;border-radius:9999px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;background:{{ g.bg }};color:{{ g.fg }};border:0.5px solid {{ g.border }};">{{ g.label }}</div>
+          </sc-for>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:2px 20px 12px;">
+          <span style="font-size:13px;color:#A6A8AE;font-weight:500;">{{ closetCount }}</span>
+          <div style="display:flex;align-items:center;gap:2px;background:#fff;border-radius:9999px;padding:3px;box-shadow:0 1px 2px rgba(0,0,0,0.05);">
+            <div onClick="{{ setGridView }}" style="width:32px;height:26px;border-radius:9999px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:{{ gridBtnBg }};">
+              <svg width="14" height="14" viewBox="0 0 24 24"><rect x="3" y="3" width="7.5" height="7.5" rx="1.8" fill="{{ gridBtnColor }}"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.8" fill="{{ gridBtnColor }}"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.8" fill="{{ gridBtnColor }}"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.8" fill="{{ gridBtnColor }}"/></svg>
+            </div>
+            <div onClick="{{ setListView }}" style="width:32px;height:26px;border-radius:9999px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:{{ listBtnBg }};">
+              <svg width="14" height="14" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="3" rx="1.5" fill="{{ listBtnColor }}"/><rect x="3" y="10.5" width="18" height="3" rx="1.5" fill="{{ listBtnColor }}"/><rect x="3" y="16.5" width="18" height="3" rx="1.5" fill="{{ listBtnColor }}"/></svg>
+            </div>
+          </div>
+          <div onClick="{{ openFilter }}" style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;font-weight:600;color:{{ filterBtnColor }};background:{{ filterBtnBg }};padding:6px 13px;border-radius:9999px;box-shadow:0 1px 2px rgba(0,0,0,0.05);border:0.5px solid #E8E8EC;">
+            <svg width="14" height="14" viewBox="0 0 24 24"><path d="M3 5h18M6 12h12M10 19h4" stroke="{{ filterBtnIcon }}" stroke-width="2.2" stroke-linecap="round"/></svg>
+            <span>Filter</span>
+            <sc-if value="{{ filterBadge }}" hint-placeholder-val="{{ false }}">
+              <span style="min-width:17px;height:17px;border-radius:9999px;background:#fff;color:#17171B;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px;">{{ filterBadge }}</span>
+            </sc-if>
+          </div>
+        </div>
+        </div>
+
+        <sc-if value="{{ editMode }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;gap:9px;padding:2px 20px 14px;">
+            <div onClick="{{ onAddItem }}" style="flex:1;height:43px;border-radius:12px;background:#17171B;color:#fff;display:flex;align-items:center;justify-content:center;gap:5px;font-size:13.5px;font-weight:600;cursor:pointer;">+ Add item</div>
+            <div onClick="{{ onAddSlot }}" style="flex:1;height:43px;border-radius:12px;background:#fff;border:0.5px solid #E2E2E6;color:#17171B;display:flex;align-items:center;justify-content:center;gap:5px;font-size:13.5px;font-weight:600;cursor:pointer;">+ Add outfit slot</div>
+          </div>
+          <div style="padding:0 20px 16px;">
+            <div style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,0.04);">
+              <sc-for list="{{ slotRows }}" as="s" hint-placeholder-count="6">
+                <div style="display:flex;align-items:center;gap:9px;padding:10px 12px 10px 16px;border-bottom:0.5px solid {{ s.sep }};">
+                  <div onClick="{{ s.onEdit }}" style="flex:1;min-width:0;cursor:pointer;">
+                    <div style="font-size:14px;font-weight:600;letter-spacing:-0.01em;display:flex;align-items:center;gap:7px;">{{ s.label }}<span style="font-size:8.5px;font-weight:700;letter-spacing:0.04em;padding:2px 7px;border-radius:6px;background:{{ s.tagBg }};color:{{ s.tagColor }};">{{ s.tag }}</span></div>
+                    <div style="font-size:11.5px;color:#A6A8AE;margin-top:2px;">{{ s.sub }}</div>
+                  </div>
+                  <div onClick="{{ s.onUp }}" style="width:30px;height:30px;border-radius:8px;background:{{ s.upBg }};display:flex;align-items:center;justify-content:center;font-size:11px;color:{{ s.upColor }};cursor:pointer;">&#9650;</div>
+                  <div onClick="{{ s.onDown }}" style="width:30px;height:30px;border-radius:8px;background:{{ s.downBg }};display:flex;align-items:center;justify-content:center;font-size:11px;color:{{ s.downColor }};cursor:pointer;">&#9660;</div>
+                  <div onClick="{{ s.onEdit }}" style="width:30px;height:30px;border-radius:8px;background:#F1F1F4;display:flex;align-items:center;justify-content:center;font-size:13px;color:#5B5D63;cursor:pointer;">&#9998;</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isGridView }}" hint-placeholder-val="{{ true }}">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 20px;">
+          <sc-for list="{{ cards }}" as="c" hint-placeholder-count="6">
+            <div onClick="{{ c.onOpen }}" style="background:#fff;border-radius:16px;padding:8px;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,0.04),0 4px 16px rgba(0,0,0,0.03);position:relative;min-width:0;">
+              <sc-if value="{{ editMode }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute;top:14px;left:14px;z-index:2;width:24px;height:24px;border-radius:9999px;background:rgba(23,23,27,0.82);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;">&#9998;</div>
+              </sc-if>
+              <div style="position:relative;aspect-ratio:1/1;border-radius:11px;background:#EEEEF1;display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:9px;">
+                <sc-if value="{{ c.hasPhoto }}" hint-placeholder-val="{{ false }}">
+                  {{ c.photoNode }}
+                </sc-if>
+                <span style="font-family:ui-monospace,Menlo,monospace;font-size:9.5px;letter-spacing:0.1em;color:#B9BBC1;">{{ c.colorTag }}</span>
+                <div style="position:absolute;top:8px;right:8px;display:flex;">
+                  <sc-for list="{{ c.colorDots }}" as="cd" hint-placeholder-count="1"><span style="width:15px;height:15px;border-radius:9999px;background:{{ cd.hex }};border:1.5px solid #fff;box-shadow:0 0 0 0.5px rgba(0,0,0,0.12);margin-left:-4px;"></span></sc-for>
+                </div>
+              </div>
+              <div style="font-size:13.5px;font-weight:600;letter-spacing:-0.01em;line-height:1.2;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ c.name }}</div>
+              <div style="font-size:11px;color:#A6A8AE;margin-bottom:9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ c.sub }}</div>
+              <div style="display:flex;align-items:center;justify-content:flex-end;">
+                <span style="font-size:10.5px;color:#AEB0B6;font-weight:500;">{{ c.wornLabel }}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        </sc-if>
+        <sc-if value="{{ isListView }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:9px;padding:0 20px;">
+          <sc-for list="{{ cards }}" as="c" hint-placeholder-count="6">
+            <div onClick="{{ c.onOpen }}" style="display:flex;align-items:center;gap:13px;background:#fff;border-radius:14px;padding:9px 12px 9px 10px;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,0.04);position:relative;">
+              <div style="position:relative;width:54px;height:54px;border-radius:11px;background:#EEEEF1;flex:none;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+                <sc-if value="{{ c.hasPhoto }}" hint-placeholder-val="{{ false }}">
+                  {{ c.photoNode }}
+                </sc-if>
+                <sc-if value="{{ editMode }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:absolute;inset:0;z-index:2;background:rgba(23,23,27,0.5);display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;">&#9998;</div>
+                </sc-if>
+                <span style="font-family:ui-monospace,Menlo,monospace;font-size:7.5px;letter-spacing:0.08em;color:#B9BBC1;">{{ c.colorTag }}</span>
+                <div style="position:absolute;bottom:5px;right:5px;display:flex;">
+                  <sc-for list="{{ c.colorDots }}" as="cd" hint-placeholder-count="1"><span style="width:12px;height:12px;border-radius:9999px;background:{{ cd.hex }};border:1.5px solid #fff;box-shadow:0 0 0 0.5px rgba(0,0,0,0.1);margin-left:-3px;"></span></sc-for>
+                </div>
+              </div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:14.5px;font-weight:600;letter-spacing:-0.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ c.name }}</div>
+                <div style="font-size:11.5px;color:#A6A8AE;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ c.sub }}</div>
+              </div>
+              <span style="font-size:10.5px;color:#AEB0B6;font-weight:500;flex:none;">{{ c.wornLabel }}</span>
+            </div>
+          </sc-for>
+        </div>
+        </sc-if>
+      </div>
+      </sc-if>
+
+      <!-- ============ GENERATE ============ -->
+      <sc-if value="{{ isGenerate }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:6px 20px 28px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;background:#fff;border-radius:16px;padding:13px 16px;margin-bottom:12px;box-shadow:0 1px 2px rgba(0,0,0,0.04);">
+          <div>
+            <div style="font-size:14px;font-weight:600;">Recency filter</div>
+            <div style="font-size:12px;color:#A6A8AE;margin-top:2px;">{{ recencyLabel }}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <div onClick="{{ decRecency }}" style="width:32px;height:32px;border-radius:9999px;background:#F1F1F4;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5B5D63;cursor:pointer;user-select:none;">&minus;</div>
+            <span style="font-size:17px;font-weight:700;min-width:26px;text-align:center;">{{ recency }}</span>
+            <div onClick="{{ incRecency }}" style="width:32px;height:32px;border-radius:9999px;background:#F1F1F4;display:flex;align-items:center;justify-content:center;font-size:18px;color:#5B5D63;cursor:pointer;user-select:none;">+</div>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:11px;background:{{ genBg }};border:0.5px solid {{ genBorder }};border-radius:14px;padding:12px 14px;margin-bottom:16px;">
+          <div style="width:24px;height:24px;border-radius:9999px;background:{{ genDot }};display:flex;align-items:center;justify-content:center;flex:none;color:#fff;font-size:14px;font-weight:700;line-height:1;">{{ genGlyph }}</div>
+          <div style="min-width:0;">
+            <div style="font-size:13.5px;font-weight:600;color:{{ genText }};">{{ genMsg }}</div>
+            <div style="font-size:12px;color:#8C8E94;margin-top:1px;line-height:1.35;">{{ genSub }}</div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:18px;">
+          <sc-for list="{{ outfitRows }}" as="r" hint-placeholder-count="4">
+            <div style="display:flex;align-items:center;gap:12px;background:#fff;border-radius:15px;padding:9px 10px;box-shadow:0 1px 2px rgba(0,0,0,0.04);opacity:{{ r.opacity }};">
+              <div style="width:52px;height:52px;border-radius:10px;background:{{ r.thumbBg }};flex:none;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+                <span style="font-family:ui-monospace,Menlo,monospace;font-size:7.5px;letter-spacing:0.08em;color:#B9BBC1;">{{ r.thumbTag }}</span>
+                <span style="position:absolute;bottom:6px;right:6px;width:11px;height:11px;border-radius:9999px;background:{{ r.colorHex }};border:1.5px solid #fff;box-shadow:0 0 0 0.5px rgba(0,0,0,0.1);"></span>
+              </div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:#B9BBC1;margin-bottom:1px;">{{ r.slotLabel }}</div>
+                <div style="font-size:14.5px;font-weight:600;letter-spacing:-0.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:{{ r.nameColor }};">{{ r.name }}</div>
+                <div style="font-size:11px;color:#A6A8AE;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ r.sub }}</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;flex:none;">
+                <div onClick="{{ r.onLock }}" style="padding:6px 11px;border-radius:9999px;font-size:11px;font-weight:600;cursor:pointer;background:{{ r.lockBg }};color:{{ r.lockColor }};white-space:nowrap;">{{ r.lockLabel }}</div>
+                <div onClick="{{ r.onReroll }}" style="width:32px;height:32px;border-radius:9999px;background:#F1F1F4;display:flex;align-items:center;justify-content:center;font-size:16px;color:#5B5D63;cursor:pointer;">&#8635;</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:#A6A8AE;margin:0 2px 10px;">Slots in this outfit</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px;">
+          <sc-for list="{{ slotToggles }}" as="s" hint-placeholder-count="8">
+            <div onClick="{{ s.onToggle }}" style="padding:7px 13px;border-radius:9999px;font-size:12.5px;font-weight:600;cursor:pointer;background:{{ s.bg }};color:{{ s.fg }};border:0.5px solid {{ s.border }};">{{ s.label }}</div>
+          </sc-for>
+        </div>
+
+        <div style="display:flex;gap:10px;">
+          <div onClick="{{ onShuffle }}" style="flex:1;height:50px;border-radius:14px;background:#fff;border:0.5px solid #E6E6EA;display:flex;align-items:center;justify-content:center;gap:7px;font-size:15px;font-weight:600;color:#17171B;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,0.04);"><span style="font-size:17px;">&#8635;</span>Shuffle</div>
+          <div onClick="{{ onLog }}" style="flex:1;height:50px;border-radius:14px;background:#17171B;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;color:#fff;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,0.18);">Log as worn</div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ============ LOG ============ -->
+      <sc-if value="{{ isLog }}" hint-placeholder-val="{{ false }}">
+      <div style="height:100%;box-sizing:border-box;padding:8px 20px 16px;display:flex;flex-direction:column;gap:8px;">
+        <sc-for list="{{ logEntries }}" as="e" hint-placeholder-count="7">
+          <div onClick="{{ e.onOpen }}" style="flex:1;display:flex;align-items:center;gap:12px;background:#fff;border-radius:14px;padding:12px 15px;box-shadow:0 1px 2px rgba(0,0,0,0.04);cursor:pointer;">
+            <div style="flex:none;min-width:0;">
+              <div style="font-size:15px;font-weight:700;letter-spacing:-0.01em;line-height:1.1;">{{ e.weekday }}</div>
+              <div style="font-size:12px;color:#A6A8AE;margin-top:1px;">{{ e.dateLabel }}</div>
+            </div>
+            <div style="flex:1;display:flex;align-items:center;justify-content:center;">
+              <sc-for list="{{ e.swatches }}" as="s" hint-placeholder-count="4">
+                <div style="width:28px;height:28px;border-radius:8px;background:{{ s.hex }};border:2px solid #fff;margin-left:{{ s.ml }};box-shadow:0 0 0 0.5px rgba(0,0,0,0.09);display:flex;align-items:center;justify-content:center;">
+                  <span style="font-size:9px;font-weight:700;color:{{ s.extraColor }};">{{ s.extra }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <span style="font-size:10.5px;font-weight:600;color:#7C7E84;background:#F2F2F4;padding:4px 10px;border-radius:9999px;flex:none;">{{ e.formalityLabel }}</span>
+          </div>
+        </sc-for>
+      </div>
+      </sc-if>
+
+      <!-- ============ RULES ============ -->
+      <sc-if value="{{ isRules }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:2px 20px 32px;">
+        <div style="font-size:13px;color:#8C8E94;line-height:1.5;padding:8px 2px 16px;">Pick an item, then everything it can&rsquo;t be worn with. The generator keeps those pairs apart when building a fit.</div>
+
+        <div style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,0.04);margin-bottom:18px;">
+          <sc-for list="{{ ruleRows }}" as="r" hint-placeholder-count="3">
+            <div style="display:flex;align-items:center;gap:10px;padding:12px 12px 12px 16px;border-bottom:0.5px solid {{ r.sep }};">
+              <div style="flex:1;min-width:0;font-size:14px;font-weight:600;letter-spacing:-0.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ r.aName }} <span style="color:#C0C2C8;font-weight:500;margin:0 3px;">&times;</span> {{ r.bName }}</div>
+              <div onClick="{{ r.onDelete }}" style="width:28px;height:28px;border-radius:8px;background:#F4F4F6;display:flex;align-items:center;justify-content:center;flex:none;cursor:pointer;">
+                <svg width="14" height="14" viewBox="0 0 24 24"><path d="M5 7h14M9 7V5h6v2M8 7l1 13h6l1-13" fill="none" stroke="#9A9CA2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            </div>
+          </sc-for>
+          <sc-if value="{{ noRules }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:26px 16px;text-align:center;font-size:13.5px;color:#B0B2B8;">No rules yet &mdash; add your first below.</div>
+          </sc-if>
+        </div>
+
+        <div onClick="{{ onAddRule }}" style="height:48px;border-radius:14px;border:1.5px dashed #D6D6DB;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#A6A8AE;cursor:pointer;">+ Add rule</div>
+      </div>
+      </sc-if>
+
+    </div>
+
+    <!-- TAB BAR -->
+    <div style="flex:none;display:flex;justify-content:space-around;align-items:flex-start;padding:9px 8px 26px;background:rgba(250,250,250,0.94);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:0.5px solid rgba(0,0,0,0.07);">
+      <div onClick="{{ goCloset }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;">
+        <sc-if value="{{ isGridView }}" hint-placeholder-val="{{ true }}">
+          <svg width="23" height="23" viewBox="0 0 24 24"><rect x="3" y="3" width="7.5" height="7.5" rx="2" fill="{{ tColCloset }}"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2" fill="{{ tColCloset }}"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2" fill="{{ tColCloset }}"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2" fill="{{ tColCloset }}"/></svg>
+        </sc-if>
+        <sc-if value="{{ isListView }}" hint-placeholder-val="{{ false }}">
+          <svg width="23" height="23" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="3" rx="1.5" fill="{{ tColCloset }}"/><rect x="3" y="10.5" width="18" height="3" rx="1.5" fill="{{ tColCloset }}"/><rect x="3" y="16.5" width="18" height="3" rx="1.5" fill="{{ tColCloset }}"/></svg>
+        </sc-if>
+        <span style="font-size:10px;font-weight:600;color:{{ tColCloset }};">Closet</span>
+      </div>
+      <div onClick="{{ goGenerate }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;">
+        <svg width="23" height="23" viewBox="0 0 24 24"><rect x="6.5" y="6.5" width="11" height="11" rx="2" transform="rotate(45 12 12)" fill="none" stroke="{{ tColGenerate }}" stroke-width="2"/><rect x="16.5" y="2.8" width="4.6" height="4.6" rx="1.2" transform="rotate(45 18.8 5.1)" fill="{{ tColGenerate }}"/></svg>
+        <span style="font-size:10px;font-weight:600;color:{{ tColGenerate }};">Generate</span>
+      </div>
+      <div onClick="{{ goLog }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;">
+        <svg width="23" height="23" viewBox="0 0 24 24"><rect x="4" y="5.5" width="16" height="2.4" rx="1.2" fill="{{ tColLog }}"/><rect x="4" y="10.8" width="16" height="2.4" rx="1.2" fill="{{ tColLog }}"/><rect x="4" y="16.1" width="11" height="2.4" rx="1.2" fill="{{ tColLog }}"/></svg>
+        <span style="font-size:10px;font-weight:600;color:{{ tColLog }};">Log</span>
+      </div>
+    </div>
+
+    <!-- FILTER MODAL -->
+    <sc-if value="{{ filterOpen }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ closeFilter }}" style="position:absolute;inset:0;z-index:76;background:rgba(10,10,12,0.34);display:flex;align-items:flex-end;animation:fadeIn .2s ease;">
+        <div onClick="{{ stopProp }}" style="background:#fff;width:100%;border-radius:28px 28px 0 0;padding:10px 20px 36px;max-height:90%;overflow-y:auto;animation:sheetIn .32s cubic-bezier(.2,.85,.25,1);">
+          <div style="width:38px;height:5px;border-radius:9999px;background:#E2E2E6;margin:0 auto 14px;"></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+            <div style="font-size:20px;font-weight:700;letter-spacing:-0.02em;">Filter</div>
+            <div onClick="{{ clearFilters }}" style="font-size:14px;font-weight:600;color:#A6A8AE;cursor:pointer;">Clear all</div>
+          </div>
+
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#A6A8AE;margin:0 2px 10px;">Color</div>
+          <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-bottom:20px;">
+            <sc-for list="{{ filterColorChips }}" as="c" hint-placeholder-count="10"><div onClick="{{ c.onClick }}" style="width:34px;height:34px;border-radius:9999px;background:{{ c.hex }};cursor:pointer;box-shadow:{{ c.ring }};"></div></sc-for>
+          </div>
+
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#A6A8AE;margin:0 2px 10px;">Formality</div>
+          <div style="display:flex;gap:7px;margin-bottom:20px;">
+            <sc-for list="{{ filterFormChips }}" as="c" hint-placeholder-count="3"><div onClick="{{ c.onClick }}" style="flex:1;text-align:center;padding:11px 6px;border-radius:11px;font-size:12.5px;font-weight:600;cursor:pointer;background:{{ c.bg }};color:{{ c.fg }};border:0.5px solid {{ c.border }};">{{ c.label }}</div></sc-for>
+          </div>
+
+          <sc-if value="{{ hasCategories }}" hint-placeholder-val="{{ true }}">
+            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#A6A8AE;margin:0 2px 10px;">Category</div>
+            <div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:24px;">
+              <sc-for list="{{ filterCatChips }}" as="c" hint-placeholder-count="6"><div onClick="{{ c.onClick }}" style="padding:8px 13px;border-radius:9999px;font-size:13px;font-weight:600;cursor:pointer;background:{{ c.bg }};color:{{ c.fg }};border:0.5px solid {{ c.border }};">{{ c.label }}</div></sc-for>
+            </div>
+          </sc-if>
+
+          <div onClick="{{ closeFilter }}" style="height:50px;border-radius:14px;background:#17171B;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;color:#fff;cursor:pointer;">Show results</div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- LOG DETAIL MODAL -->
+    <sc-if value="{{ logDetail }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ logDetail.onClose }}" style="position:absolute;inset:0;z-index:76;background:rgba(10,10,12,0.34);display:flex;align-items:flex-end;animation:fadeIn .2s ease;">
+        <div onClick="{{ stopProp }}" style="background:#fff;width:100%;border-radius:28px 28px 0 0;padding:10px 20px 36px;max-height:90%;overflow-y:auto;animation:sheetIn .32s cubic-bezier(.2,.85,.25,1);">
+          <div style="width:38px;height:5px;border-radius:9999px;background:#E2E2E6;margin:0 auto 16px;"></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+            <div>
+              <div style="font-size:22px;font-weight:700;letter-spacing:-0.02em;line-height:1.05;">{{ logDetail.weekday }}</div>
+              <div style="font-size:13.5px;color:#A6A8AE;margin-top:2px;">{{ logDetail.dateLabel }}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div style="text-align:right;">
+                <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#A6A8AE;">Outfit cost</div>
+                <div style="font-size:22px;font-weight:700;letter-spacing:-0.02em;">{{ logDetail.totalLabel }}</div>
+              </div>
+              <div onClick="{{ logDetail.onToggleEdit }}" style="padding:8px 15px;border-radius:9999px;font-size:13.5px;font-weight:600;cursor:pointer;background:{{ logDetail.editBg }};color:{{ logDetail.editColor }};">{{ logDetail.editLabel }}</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:9px;">
+            <sc-for list="{{ logDetail.items }}" as="it" hint-placeholder-count="4">
+              <div style="display:flex;align-items:center;gap:12px;background:#F7F7F9;border-radius:14px;padding:9px 13px 9px 9px;">
+                <div style="position:relative;width:46px;height:46px;border-radius:10px;background:#EEEEF1;flex:none;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+                  <sc-if value="{{ it.hasPhoto }}" hint-placeholder-val="{{ false }}">{{ it.photoNode }}</sc-if>
+                  <span style="position:absolute;bottom:5px;right:5px;width:12px;height:12px;border-radius:9999px;background:{{ it.colorHex }};border:1.5px solid #fff;box-shadow:0 0 0 0.5px rgba(0,0,0,0.1);"></span>
+                </div>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:14.5px;font-weight:600;letter-spacing:-0.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ it.name }}</div>
+                  <div style="font-size:11.5px;color:#A6A8AE;margin-top:1px;">{{ it.slotLabel }} &middot; {{ it.formalityLabel }}</div>
+                </div>
+                <sc-if value="{{ logDetail.isEditing }}" hint-placeholder-val="{{ false }}">
+                  <div onClick="{{ it.onSwap }}" style="display:flex;align-items:center;gap:5px;padding:7px 12px;border-radius:9999px;background:#fff;border:0.5px solid #E2E2E6;font-size:12.5px;font-weight:600;color:#17171B;cursor:pointer;flex:none;"><svg width="13" height="13" viewBox="0 0 24 24"><path d="M7 4L3 8l4 4M3 8h13M17 20l4-4-4-4M21 16H8" fill="none" stroke="#17171B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Swap</div>
+                </sc-if>
+                <sc-if value="{{ it.priceShow }}" hint-placeholder-val="{{ true }}">
+                  <span style="font-size:14px;font-weight:600;color:#17171B;flex:none;">{{ it.priceLabel }}</span>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+
+          <sc-if value="{{ logDetail.swap }}" hint-placeholder-val="{{ false }}">
+            <div onClick="{{ logDetail.swap.onCancel }}" style="position:fixed;inset:0;z-index:90;"></div>
+            <div style="position:relative;z-index:91;margin-top:16px;border-top:0.5px solid #ECECEF;padding-top:16px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+                <div style="font-size:15px;font-weight:700;letter-spacing:-0.01em;">{{ logDetail.swap.title }}</div>
+                <div onClick="{{ logDetail.swap.onCancel }}" style="font-size:13.5px;font-weight:600;color:#A6A8AE;cursor:pointer;">Cancel</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:7px;">
+                <sc-for list="{{ logDetail.swap.options }}" as="o" hint-placeholder-count="4">
+                  <div onClick="{{ o.onPick }}" style="display:flex;align-items:center;gap:11px;background:#fff;border:1px solid #EDEDF0;border-radius:12px;padding:7px 11px 7px 8px;cursor:pointer;">
+                    <div style="position:relative;width:40px;height:40px;border-radius:9px;background:#EEEEF1;flex:none;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+                      <sc-if value="{{ o.hasPhoto }}" hint-placeholder-val="{{ false }}">{{ o.photoNode }}</sc-if>
+                      <span style="position:absolute;bottom:4px;right:4px;width:10px;height:10px;border-radius:9999px;background:{{ o.colorHex }};border:1.5px solid #fff;box-shadow:0 0 0 0.5px rgba(0,0,0,0.1);"></span>
+                    </div>
+                    <div style="flex:1;min-width:0;">
+                      <div style="font-size:14px;font-weight:600;letter-spacing:-0.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ o.name }}</div>
+                      <div style="font-size:11px;color:#A6A8AE;">{{ o.slotLabel }}</div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- DETAIL SHEET (view) -->
+    <sc-if value="{{ detail }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ detail.onClose }}" style="position:absolute;inset:0;z-index:70;background:rgba(10,10,12,0.34);display:flex;align-items:flex-end;animation:fadeIn .2s ease;">
+        <div onClick="{{ stopProp }}" style="background:#fff;width:100%;border-radius:28px 28px 0 0;padding:10px 20px 40px;max-height:90%;overflow-y:auto;animation:sheetIn .32s cubic-bezier(.2,.85,.25,1);">
+          <div style="width:38px;height:5px;border-radius:9999px;background:#E2E2E6;margin:0 auto 18px;"></div>
+          <div style="aspect-ratio:4/3;border-radius:18px;background:#EEEEF1;display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:18px;overflow:hidden;">
+            <sc-if value="{{ detail.hasPhoto }}" hint-placeholder-val="{{ false }}">
+              {{ detail.photoNode }}
+            </sc-if>
+            <span style="font-family:ui-monospace,Menlo,monospace;font-size:12px;letter-spacing:0.12em;color:#B9BBC1;">{{ detail.colorTag }}</span>
+            <span style="position:absolute;top:12px;right:12px;width:22px;height:22px;border-radius:9999px;background:{{ detail.colorHex }};border:2px solid #fff;box-shadow:0 0 0 0.5px rgba(0,0,0,0.12);"></span>
+          </div>
+          <div style="font-size:22px;font-weight:700;letter-spacing:-0.02em;line-height:1.1;">{{ detail.name }}</div>
+          <div style="font-size:13.5px;color:#A6A8AE;margin-top:3px;margin-bottom:18px;">{{ detail.subline }}</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#ECECEF;border-radius:14px;overflow:hidden;margin-bottom:18px;">
+            <sc-for list="{{ detail.meta }}" as="m" hint-placeholder-count="6">
+              <div style="background:#fff;padding:12px 14px;">
+                <div style="font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#B0B2B8;margin-bottom:3px;">{{ m.label }}</div>
+                <div style="font-size:14px;font-weight:500;color:#17171B;">{{ m.value }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;gap:10px;">
+            <div onClick="{{ detail.onEdit }}" style="flex:1;height:50px;border-radius:14px;background:#fff;border:0.5px solid #E2E2E6;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;color:#17171B;cursor:pointer;">Edit</div>
+            <div onClick="{{ detail.onWorn }}" style="flex:1;height:50px;border-radius:14px;background:#17171B;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;color:#fff;cursor:pointer;">Mark as worn</div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- EDIT / ADD ITEM SHEET -->
+    <sc-if value="{{ editItem }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ onCancelEdit }}" style="position:absolute;inset:0;z-index:76;background:rgba(10,10,12,0.34);display:flex;align-items:flex-end;animation:fadeIn .2s ease;">
+        <div onClick="{{ stopProp }}" style="background:#fff;width:100%;border-radius:28px 28px 0 0;padding:10px 20px 36px;max-height:93%;overflow-y:auto;animation:sheetIn .32s cubic-bezier(.2,.85,.25,1);">
+          <div style="width:38px;height:5px;border-radius:9999px;background:#E2E2E6;margin:0 auto 14px;"></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <div style="font-size:20px;font-weight:700;letter-spacing:-0.02em;">{{ draftTitle }}</div>
+            <div onClick="{{ onCancelEdit }}" style="font-size:14px;font-weight:600;color:#A6A8AE;cursor:pointer;">Cancel</div>
+          </div>
+
+          <div style="aspect-ratio:5/2;border-radius:16px;background:#EEEEF1;display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:18px;overflow:hidden;">
+            <sc-if value="{{ draftHasPhoto }}" hint-placeholder-val="{{ false }}">
+              {{ draftPhotoNode }}
+              <div onClick="{{ onRemovePhoto }}" style="position:absolute;top:10px;right:10px;z-index:3;width:26px;height:26px;border-radius:9999px;background:rgba(23,23,27,0.7);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;cursor:pointer;">&times;</div>
+            </sc-if>
+            <span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.12em;color:#B9BBC1;">{{ draftColorTag }}</span>
+            <div style="position:absolute;top:12px;right:12px;display:flex;">
+              <sc-for list="{{ draftColorDots }}" as="cd" hint-placeholder-count="1"><span style="width:22px;height:22px;border-radius:9999px;background:{{ cd.hex }};border:2px solid #fff;box-shadow:0 0 0 0.5px rgba(0,0,0,0.12);margin-left:-7px;"></span></sc-for>
+            </div>
+            <div style="position:absolute;left:50%;bottom:12px;transform:translateX(-50%);z-index:2;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.92);border:0.5px solid #E2E2E6;border-radius:9999px;padding:7px 14px;font-size:12.5px;font-weight:600;color:#17171B;cursor:pointer;">
+              <svg width="14" height="14" viewBox="0 0 24 24"><path d="M4 17l5-6 4 4 3-3 4 5" fill="none" stroke="#17171B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="8.5" cy="7.5" r="1.8" fill="#17171B"/></svg>
+              {{ photoBtnLabel }}
+              <input type="file" accept="image/*" onChange="{{ onPhotoFile }}" style="position:absolute;inset:0;opacity:0;cursor:pointer;"/>
+            </div>
+          </div>
+
+          <div style="margin-bottom:15px;">
+            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#A6A8AE;margin:0 2px 7px;">Name</div>
+            <input value="{{ draftName }}" onInput="{{ onDraftName }}" placeholder="e.g. Linen blazer" style="width:100%;border:0.5px solid #E2E2E6;background:#F7F7F9;border-radius:11px;padding:11px 13px;font-size:15px;font-family:inherit;color:#17171B;outline:none;"/>
+          </div>
+
+          <div style="margin-bottom:15px;">
+            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#A6A8AE;margin:0 2px 7px;">Outfit slot</div>
+            <div style="display:flex;flex-wrap:wrap;gap:7px;">
+              <sc-for list="{{ draftSlotChips }}" as="c" hint-placeholder-count="8"><div onClick="{{ c.onClick }}" style="padding:8px 13px;border-radius:9999px;font-size:13px;font-weight:600;cursor:pointer;background:{{ c.bg }};color:{{ c.fg }};border:0.5px solid {{ c.border }};">{{ c.label }}</div></sc-for>
+            </div>
+          </div>
+
+          <div style="margin-bottom:15px;position:relative;">
+            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#A6A8AE;margin:0 2px 7px;">Category</div>
+            <input value="{{ draftCategory }}" onInput="{{ onDraftCategory }}" placeholder="e.g. Oxford shirt" style="width:100%;border:0.5px solid #E2E2E6;background:#F7F7F9;border-radius:11px;padding:11px 13px;font-size:15px;font-family:inherit;color:#17171B;outline:none;"/>
+            <sc-if value="{{ catSuggestions }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;top:calc(100% - 2px);left:0;right:0;background:#fff;border-radius:0 0 11px 11px;border:0.5px solid #E2E2E6;border-top:none;overflow:hidden;z-index:10;">
+                <sc-for list="{{ catSuggestions }}" as="s" hint-placeholder-count="2">
+                  <div onClick="{{ s.onSelect }}" style="padding:10px 13px;font-size:14px;color:#17171B;cursor:pointer;border-top:0.5px solid #F2F2F4;">{{ s.label }}</div>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+
+          <div style="margin-bottom:15px;">
+            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#A6A8AE;margin:0 2px 7px;">Color &middot; up to 2</div>
+            <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px;">
+              <sc-for list="{{ draftColorChips }}" as="c" hint-placeholder-count="13"><div onClick="{{ c.onClick }}" style="width:34px;height:34px;border-radius:9999px;background:{{ c.hex }};cursor:pointer;box-shadow:{{ c.ring }};"></div></sc-for>
+            </div>
+          </div>
+
+          <div style="margin-bottom:15px;">
+            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#A6A8AE;margin:0 2px 7px;">Material</div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <sc-for list="{{ draftMaterials }}" as="m" hint-placeholder-count="1">
+                <div style="display:flex;gap:8px;align-items:center;position:relative;">
+                  <div style="position:relative;width:74px;flex:none;">
+                    <input value="{{ m.pct }}" onInput="{{ m.onPct }}" inputmode="numeric" placeholder="0" style="width:100%;border:0.5px solid #E2E2E6;background:#F7F7F9;border-radius:11px;padding:11px 24px 11px 13px;font-size:15px;font-family:inherit;color:#17171B;outline:none;"/>
+                    <span style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:14px;color:#A6A8AE;pointer-events:none;">%</span>
+                  </div>
+                  <div style="flex:1;min-width:0;position:relative;">
+                    <input value="{{ m.name }}" onInput="{{ m.onName }}" placeholder="e.g. Cotton" style="width:100%;border:0.5px solid #E2E2E6;background:#F7F7F9;border-radius:11px;padding:11px 13px;font-size:15px;font-family:inherit;color:#17171B;outline:none;"/>
+                    <sc-if value="{{ m.nameSuggestions }}" hint-placeholder-val="{{ false }}">
+                      <div style="position:absolute;top:calc(100% - 2px);left:0;right:0;background:#fff;border-radius:0 0 11px 11px;border:0.5px solid #E2E2E6;border-top:none;overflow:hidden;z-index:10;">
+                        <sc-for list="{{ m.nameSuggestions }}" as="s" hint-placeholder-count="2">
+                          <div onClick="{{ s.onSelect }}" style="padding:10px 13px;font-size:14px;color:#17171B;cursor:pointer;border-top:0.5px solid #F2F2F4;">{{ s.label }}</div>
+                        </sc-for>
+                      </div>
+                    </sc-if>
+                  </div>
+                  <sc-if value="{{ m.showRemove }}" hint-placeholder-val="{{ false }}">
+                    <div onClick="{{ m.onRemove }}" style="width:34px;height:34px;flex:none;border-radius:9px;background:#F4F4F6;display:flex;align-items:center;justify-content:center;color:#9A9CA2;font-size:18px;line-height:1;cursor:pointer;">&times;</div>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+            <div onClick="{{ onAddMaterial }}" style="margin-top:8px;display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:#5B5D63;cursor:pointer;padding:6px 2px;">+ Add material</div>
+          </div>
+
+          <div style="margin-bottom:15px;">
+            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#A6A8AE;margin:0 2px 7px;">Price</div>
+            <div style="display:flex;gap:8px;">
+              <div style="display:flex;gap:3px;background:#F7F7F9;border:0.5px solid #E2E2E6;border-radius:11px;padding:4px;">
+                <sc-for list="{{ draftCurrencyChips }}" as="c" hint-placeholder-count="4"><div onClick="{{ c.onClick }}" style="width:36px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;cursor:pointer;background:{{ c.bg }};color:{{ c.fg }};">{{ c.symbol }}</div></sc-for>
+              </div>
+              <input value="{{ draftPrice }}" onInput="{{ onDraftPrice }}" inputmode="numeric" placeholder="0" style="flex:1;min-width:0;border:0.5px solid #E2E2E6;background:#F7F7F9;border-radius:11px;padding:11px 13px;font-size:15px;font-family:inherit;color:#17171B;outline:none;"/>
+            </div>
+          </div>
+
+          <div style="margin-bottom:20px;">
+            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#A6A8AE;margin:0 2px 7px;">Formality</div>
+            <div style="display:flex;gap:7px;">
+              <sc-for list="{{ draftFormChips }}" as="c" hint-placeholder-count="3"><div onClick="{{ c.onClick }}" style="flex:1;text-align:center;padding:11px 6px;border-radius:11px;font-size:12px;font-weight:600;cursor:pointer;background:{{ c.bg }};color:{{ c.fg }};border:0.5px solid {{ c.border }};line-height:1.2;">{{ c.label }}</div></sc-for>
+            </div>
+          </div>
+
+          <div onClick="{{ onSaveItem }}" style="height:50px;border-radius:14px;background:#17171B;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;color:#fff;cursor:pointer;">{{ saveLabel }}</div>
+          <sc-if value="{{ canDelete }}" hint-placeholder-val="{{ false }}">
+            <div onClick="{{ onDeleteItem }}" style="height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:14.5px;font-weight:600;color:#D0556B;cursor:pointer;margin-top:8px;">Delete item</div>
+          </sc-if>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ADD SLOT SHEET -->
+    <sc-if value="{{ editSlot }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ onCancelSlot }}" style="position:absolute;inset:0;z-index:76;background:rgba(10,10,12,0.34);display:flex;align-items:flex-end;animation:fadeIn .2s ease;">
+        <div onClick="{{ stopProp }}" style="background:#fff;width:100%;border-radius:28px 28px 0 0;padding:10px 20px 36px;animation:sheetIn .32s cubic-bezier(.2,.85,.25,1);">
+          <div style="width:38px;height:5px;border-radius:9999px;background:#E2E2E6;margin:0 auto 14px;"></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+            <div style="font-size:20px;font-weight:700;letter-spacing:-0.02em;">{{ slotSheetTitle }}</div>
+            <div onClick="{{ onCancelSlot }}" style="font-size:14px;font-weight:600;color:#A6A8AE;cursor:pointer;">Cancel</div>
+          </div>
+          <div style="margin-bottom:16px;">
+            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#A6A8AE;margin:0 2px 7px;">Slot name</div>
+            <input value="{{ slotName }}" onInput="{{ onSlotName }}" placeholder="e.g. Scarf, Hat, Socks" style="width:100%;border:0.5px solid #E2E2E6;background:#F7F7F9;border-radius:11px;padding:11px 13px;font-size:15px;font-family:inherit;color:#17171B;outline:none;"/>
+          </div>
+          <div style="margin-bottom:18px;">
+            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#A6A8AE;margin:0 2px 7px;">Shows under in Closet</div>
+            <div style="display:flex;flex-wrap:wrap;gap:7px;">
+              <sc-for list="{{ slotGroupChips }}" as="c" hint-placeholder-count="5"><div onClick="{{ c.onClick }}" style="padding:8px 13px;border-radius:9999px;font-size:13px;font-weight:600;cursor:pointer;background:{{ c.bg }};color:{{ c.fg }};border:0.5px solid {{ c.border }};">{{ c.label }}</div></sc-for>
+            </div>
+          </div>
+          <div style="font-size:12.5px;color:#A6A8AE;line-height:1.45;margin-bottom:18px;">New slots start switched off in the generator — turn them on when building a fit. Top, bottom and shoes stay required.</div>
+          <div onClick="{{ onSaveSlot }}" style="height:50px;border-radius:14px;background:#17171B;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;color:#fff;cursor:pointer;">{{ slotSaveLabel }}</div>
+          <sc-if value="{{ canDeleteSlot }}" hint-placeholder-val="{{ false }}">
+            <div onClick="{{ onDeleteSlot }}" style="height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:14.5px;font-weight:600;color:#D0556B;cursor:pointer;margin-top:8px;">Remove slot</div>
+          </sc-if>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ADD RULE SHEET -->
+    <sc-if value="{{ rulePicker }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ rule.onCancel }}" style="position:absolute;inset:0;z-index:76;background:rgba(10,10,12,0.34);display:flex;align-items:flex-end;animation:fadeIn .2s ease;">
+        <div onClick="{{ stopProp }}" style="background:#fff;width:100%;border-radius:28px 28px 0 0;padding:10px 20px 32px;height:86%;display:flex;flex-direction:column;animation:sheetIn .32s cubic-bezier(.2,.85,.25,1);">
+          <div style="width:38px;height:5px;border-radius:9999px;background:#E2E2E6;margin:0 auto 14px;flex:none;"></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex:none;">
+            <div style="font-size:20px;font-weight:700;letter-spacing:-0.02em;">New rule</div>
+            <div onClick="{{ rule.onCancel }}" style="font-size:14px;font-weight:600;color:#A6A8AE;cursor:pointer;">Cancel</div>
+          </div>
+          <div style="font-size:13px;color:#8C8E94;line-height:1.45;margin-bottom:14px;flex:none;">{{ rule.prompt }}.</div>
+
+          <sc-if value="{{ rule.hasAnchor }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;align-items:center;gap:11px;background:#17171B;border-radius:13px;padding:11px 13px;margin-bottom:12px;flex:none;">
+              <span style="width:22px;height:22px;border-radius:9999px;background:{{ rule.anchorHex }};border:2px solid rgba(255,255,255,0.85);flex:none;"></span>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:rgba(255,255,255,0.55);margin-bottom:1px;">Item</div>
+                <div style="font-size:14.5px;font-weight:600;letter-spacing:-0.01em;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ rule.anchorName }}</div>
+              </div>
+              <div onClick="{{ rule.onResetAnchor }}" style="font-size:12.5px;font-weight:600;color:rgba(255,255,255,0.7);cursor:pointer;flex:none;">Change</div>
+            </div>
+          </sc-if>
+
+          <div style="flex:none;display:flex;gap:7px;overflow-x:auto;padding:2px 0 10px;">
+            <sc-for list="{{ ruleSlotChips }}" as="c" hint-placeholder-count="7">
+              <div onClick="{{ c.onClick }}" style="flex:none;padding:6px 13px;border-radius:9999px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:{{ c.bg }};color:{{ c.fg }};border:0.5px solid {{ c.border }};">{{ c.label }}</div>
+            </sc-for>
+          </div>
+          <div style="flex:none;position:relative;margin-bottom:10px;">
+            <input value="{{ ruleSearch }}" onInput="{{ onRuleSearch }}" placeholder="Search pieces..." style="width:100%;border:0.5px solid #E2E2E6;background:#F7F7F9;border-radius:11px;padding:10px 13px 10px 36px;font-size:14px;font-family:inherit;color:#17171B;outline:none;"/>
+            <svg width="15" height="15" viewBox="0 0 24 24" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none;"><circle cx="11" cy="11" r="7" fill="none" stroke="#B0B2B8" stroke-width="2.2"/><line x1="16.5" y1="16.5" x2="21" y2="21" stroke="#B0B2B8" stroke-width="2.2" stroke-linecap="round"/></svg>
+          </div>
+          <div style="flex:1;overflow-y:auto;margin:0 -4px 14px;padding:2px 4px;">
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <sc-for list="{{ rule.pieces }}" as="p" hint-placeholder-count="8">
+                <div onClick="{{ p.onPick }}" style="display:flex;align-items:center;gap:11px;background:{{ p.rowBg }};border:1px solid {{ p.rowBorder }};border-radius:12px;padding:7px 11px 7px 8px;cursor:pointer;">
+                  <div style="position:relative;width:40px;height:40px;border-radius:9px;background:#EEEEF1;flex:none;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+                    <span style="font-family:ui-monospace,Menlo,monospace;font-size:6.5px;letter-spacing:0.06em;color:#B9BBC1;">{{ p.colorTag }}</span>
+                    <span style="position:absolute;bottom:4px;right:4px;width:10px;height:10px;border-radius:9999px;background:{{ p.colorHex }};border:1.5px solid #fff;box-shadow:0 0 0 0.5px rgba(0,0,0,0.1);"></span>
+                  </div>
+                  <div style="flex:1;min-width:0;">
+                    <div style="font-size:14px;font-weight:600;letter-spacing:-0.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ p.name }}</div>
+                    <div style="font-size:11px;color:#A6A8AE;">{{ p.slotLabel }}</div>
+                  </div>
+                  <span style="font-size:15px;font-weight:700;color:#17171B;flex:none;width:18px;text-align:center;">{{ p.check }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div onClick="{{ rule.onCreate }}" style="height:50px;border-radius:14px;background:{{ rule.createBg }};display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;color:#fff;cursor:pointer;flex:none;">{{ rule.createLabel }}</div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- TOAST -->
+    <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;bottom:104px;left:50%;transform:translateX(-50%);background:#17171B;color:#fff;padding:11px 18px;border-radius:9999px;font-size:13px;font-weight:500;white-space:nowrap;box-shadow:0 10px 30px rgba(0,0,0,0.28);animation:toastIn .25s ease;z-index:80;">{{ toast }}</div>
+    </sc-if>
+
+  </div>
+</x-import>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;$preview&quot;: {&quot;width&quot;: 440, &quot;height&quot;: 900},
+  &quot;recencyDefault&quot;: {&quot;editor&quot;: &quot;int&quot;, &quot;default&quot;: 7, &quot;min&quot;: 0, &quot;max&quot;: 30, &quot;tsType&quot;: &quot;number&quot;},
+  &quot;startTab&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;default&quot;: &quot;closet&quot;, &quot;options&quot;: [&quot;closet&quot;, &quot;generate&quot;, &quot;log&quot;, &quot;rules&quot;], &quot;tsType&quot;: &quot;string&quot;}
+}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    const DAY = 86400000;
+    const TODAY = Date.parse('2026-06-17T12:00:00');
+    this.DAY = DAY; this.TODAY = TODAY;
+    const W = (d) => TODAY - d * DAY;
+
+    this.REQUIRED = ['top','bottom','shoes'];
+    this.formalityLabels = {1:'Casual',2:'Smart Casual',3:'Dressy'};
+    this.currencies = ['$','€','£','¥'];
+    this.colorHex = {black:'#1A1A1E',white:'#F4F4F5',cream:'#E9E1CD',navy:'#28324F',blue:'#3F6FD1',lightblue:'#9DC0EA',darkbrown:'#4A2F1E',brown:'#7C5230',darkkhaki:'#8B7B4E',khaki:'#B8A968',lightbrown:'#B98A5E',darkgray:'#3A3D42',gray:'#9A9DA4',lightgray:'#CBCDD2',darkgreen:'#1E3D32',green:'#6E6B3C',lightgreen:'#A7C09A',darkred:'#5E1F25',red:'#B23B43',lightred:'#DE8A8F'};
+    this.colorList = [
+      {key:'black',label:'Black'},{key:'white',label:'White'},{key:'cream',label:'Cream'},
+      {key:'navy',label:'Navy blue'},{key:'blue',label:'Blue'},{key:'lightblue',label:'Light blue'},
+      {key:'darkbrown',label:'Dark brown'},{key:'brown',label:'Brown'},{key:'lightbrown',label:'Light brown'},
+      {key:'darkkhaki',label:'Dark khaki'},{key:'khaki',label:'Khaki'},
+      {key:'darkgray',label:'Dark gray'},{key:'gray',label:'Gray'},{key:'lightgray',label:'Light gray'},
+      {key:'darkgreen',label:'Dark green'},{key:'green',label:'Green'},{key:'lightgreen',label:'Light green'},
+      {key:'darkred',label:'Dark red'},{key:'red',label:'Red'},{key:'lightred',label:'Light red'},
+    ];
+    this.colorLabelByKey = {};
+    this.colorList.forEach(c => { this.colorLabelByKey[c.key] = c.label; });
+    this.materialNames = ['Cotton','Pima cotton','Wool','Merino wool','Flannel','Cashmere','Linen','Silk','Polyester','Elastane','Nylon','Leather','Calf leather','Suede','Denim','Cashmere','Viscose','Tweed'];
+    this.months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    this.weekdays = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    this.closetGroups = ['Tops','Bottoms','Shoes','Mid Layers','Outerwear','Accessories'];
+    this.sorts = [{key:'color',label:'Color'},{key:'formality',label:'Formality'},{key:'category',label:'Category'}];
+
+    const fmap = {1:1,2:2,3:2,4:3,5:3};
+    const P = (id,slot,name,category,color,colorKey,material,price,formality,d) =>
+      ({id,slot,name,category,color,colorKey,material,price,formality:(fmap[formality]||formality),currency:'$',lastWorn:W(d)});
+
+    const pieces = [
+      P(1,'top','White oxford shirt','Oxford shirt','White','white','100% cotton',145,3,12),
+      P(2,'top','Blue oxford shirt','Oxford shirt','Blue','blue','100% cotton',145,3,3),
+      P(3,'top','Chambray work shirt','Work shirt','Chambray','chambray','100% cotton',120,2,20),
+      P(4,'top','White crew tee','T-shirt','White','white','100% pima cotton',45,1,1),
+      P(5,'top','Navy merino polo','Polo','Navy','navy','100% merino wool',160,2,8),
+      P(6,'midlayer','Grey crewneck sweater','Sweater','Grey','grey','100% merino wool',190,2,31),
+      P(27,'midlayer','Navy half-zip sweater','Sweater','Navy','navy','100% merino wool',175,2,45),
+      P(7,'bottom','Chalk-stripe trouser','Trouser','Navy','navy','100% wool flannel',240,4,15),
+      P(8,'bottom','Grey flannel trouser','Trouser','Grey','grey','100% wool',220,4,5),
+      P(9,'bottom','Beige chino','Chino','Beige','beige','98% cotton, 2% elastane',110,2,3),
+      P(10,'bottom','Dark wash denim','Jeans','Indigo','indigo','99% cotton, 1% elastane',130,1,1),
+      P(11,'bottom','Olive chino','Chino','Olive','olive','100% cotton',115,2,18),
+      P(26,'bottom','White denim','Jeans','White','white','100% cotton',120,1,36),
+      P(12,'shoes','Black oxford','Oxford','Black','black','Calf leather',390,5,41),
+      P(13,'shoes','Brown penny loafer','Loafer','Brown','brown','Calf leather',360,3,6),
+      P(14,'shoes','White leather sneaker','Sneaker','White','white','Leather',150,1,2),
+      P(15,'shoes','Suede chukka boot','Boot','Tan','tan','Suede',280,2,22),
+      P(16,'outerwear','Navy hopsack blazer','Blazer','Navy','navy','Wool hopsack',520,4,25),
+      P(17,'outerwear','Grey sport coat','Sport coat','Grey','grey','Wool / silk / linen',560,4,33),
+      P(18,'outerwear','Tan field jacket','Field jacket','Tan','tan','Waxed cotton',295,2,9),
+      P(19,'accessory','Brown leather belt','Belt','Brown','brown','Bridle leather',95,3,6),
+      P(20,'accessory','Black leather belt','Belt','Black','black','Calf leather',90,4,41),
+      P(21,'accessory','Steel dive watch','Watch','Silver','silver','Stainless steel',650,3,4),
+      P(22,'accessory','Leather dress watch','Watch','Brown','brown','Steel / leather',480,4,11),
+      P(23,'accessory','Navy grenadine tie','Tie','Navy','navy','100% silk',135,5,28),
+      P(24,'accessory','Burgundy knit tie','Tie','Burgundy','burgundy','100% silk',95,3,16),
+      P(25,'accessory','White linen pocket square','Pocket square','White','white','100% linen',35,5,50),
+    ];
+
+    const keyMigrate = {grey:'gray',beige:'cream',olive:'green',indigo:'navy',tan:'lightbrown',burgundy:'darkred',silver:'lightgray',chambray:'lightblue'};
+    pieces.forEach(p => {
+      const k = keyMigrate[p.colorKey] || p.colorKey;
+      p.colorKey = k;
+      p.colors = [k];
+      p.color = this.colorLabelByKey[k] || p.color;
+      p.materials = this.parseMaterials(p.material);
+      p.material = this.materialsLabel(p.materials);
+    });
+
+    const slots = [
+      {key:'top',label:'Tops',group:'Tops'},
+      {key:'bottom',label:'Bottoms',group:'Bottoms'},
+      {key:'shoes',label:'Shoes',group:'Shoes'},
+      {key:'midlayer',label:'Mid Layers',group:'Mid Layers'},
+      {key:'outerwear',label:'Outerwear',group:'Outerwear'},
+      {key:'accessory',label:'Accessories',group:'Accessories'},
+    ];
+
+    const rules = [
+      {id:'r1',kind:'color',on:true,label:'No white top with a white bottom',desc:'Color rule \u00b7 Top \u00d7 Bottom',a:{slot:'top',colorKey:'white'},b:{slot:'bottom',colorKey:'white'}},
+      {id:'r2',kind:'color',on:true,label:'No brown shoes with a black belt',desc:'Color rule \u00b7 Shoes \u00d7 Belt',a:{slot:'shoes',colorKey:'brown'},b:{slot:'belt',colorKey:'black'}},
+      {id:'r3',kind:'color',on:true,label:'No black shoes with a brown belt',desc:'Color rule \u00b7 Shoes \u00d7 Belt',a:{slot:'shoes',colorKey:'black'},b:{slot:'belt',colorKey:'brown'}},
+      {id:'r4',kind:'formality',on:true,label:'Keep formality within 1 level',desc:'Spread rule \u00b7 whole outfit',threshold:1},
+    ];
+    const exceptions = [
+      {id:'e2',mode:'block',on:true,aId:4,bId:12},
+      {id:'e3',mode:'block',on:true,aId:14,bId:16},
+    ];
+    const log = [
+      {id:'s1',dateMs:W(1),pieceIds:[4,10,14,21]},
+      {id:'s2',dateMs:W(2),pieceIds:[2,9,13,19]},
+      {id:'s3',dateMs:W(3),pieceIds:[5,11,15]},
+      {id:'s4',dateMs:W(4),pieceIds:[1,8,12,20,23]},
+      {id:'s5',dateMs:W(5),pieceIds:[6,7,13,16]},
+      {id:'s6',dateMs:W(6),pieceIds:[3,9,14,22]},
+      {id:'s7',dateMs:W(7),pieceIds:[18,10,15]},
+    ];
+
+    const startTab = (props && props.startTab) || 'closet';
+    const recency = (props && typeof props.recencyDefault === 'number') ? props.recencyDefault : 7;
+
+    this.state = {
+      tab: startTab,
+      pieces, slots, rules, exceptions, log,
+      catFilter: 'All',
+      closetView: 'grid',
+      filterColor: null,
+      filterFormality: null,
+      filterCategory: null,
+      filterOpen: false,
+      logDetailId: null,
+      logEditMode: false,
+      logSwap: null,
+      sortOpen: false,
+      editMode: false,
+      rulesOpen: false,
+      detailId: null,
+      editSheet: null,
+      draft: null,
+      slotDraftName: '',
+      slotDraftGroup: 'Accessories',
+      slotDraftKey: null,
+      recency,
+      enabledSlots: {top:true,bottom:true,shoes:true,midlayer:false,outerwear:false,accessory:false},
+      categoryHistory: [],
+      materialHistory: [],
+      ruleFilter: 'All',
+      ruleSearch: '',
+      locked: {},
+      outfit: {},
+      genStatus: null,
+      toast: null,
+    };
+  }
+
+  componentDidMount() { this.generate(); }
+
+  daysAgo(ms) { return Math.floor((this.TODAY - ms) / this.DAY); }
+  piece(id) { return this.state.pieces.find(p => p.id === id); }
+  slotObj(k) { return this.state.slots.find(s => s.key === k); }
+  slotLabel(k) { const s = this.slotObj(k); return s ? s.label : k; }
+  slotGroup(k) { const s = this.slotObj(k); return s ? s.group : 'Accessories'; }
+  colorLabel(key) { const c = this.colorList.find(c => c.key === key); return c ? c.label : key; }
+  colorsLabel(p) {
+    const arr = (p.colors && p.colors.length) ? p.colors : [p.colorKey];
+    return arr.map(k => this.colorLabel(k)).join(', ');
+  }
+  toggleDraftColor(key) {
+    const cur = (this.state.draft.colors || []).slice();
+    const i = cur.indexOf(key);
+    if (i >= 0) { if (cur.length > 1) cur.splice(i, 1); }
+    else { if (cur.length >= 2) { this.showToast('Up to 2 colors per item'); return; } cur.push(key); }
+    this.setState(s => ({draft: Object.assign({}, s.draft, {colors: cur, colorKey: cur[0], color: cur.map(k => this.colorLabel(k)).join(', ')})}));
+  }
+  colorDots(p) {
+    const arr = (p.colors && p.colors.length) ? p.colors : [p.colorKey];
+    return arr.slice(0, 2).map(k => ({hex: this.colorHex[k] || '#C9CBD1'}));
+  }
+  sideMatch(side, p) { return (!side.slot || p.slot === side.slot) && (!side.colorKey || p.colorKey === side.colorKey) && (!side.category || p.category === side.category); }
+  matchPair(r, p, q) { return (this.sideMatch(r.a, p) && this.sideMatch(r.b, q)) || (this.sideMatch(r.a, q) && this.sideMatch(r.b, p)); }
+  pairIs(e, p, q) { return (p.id === e.aId && q.id === e.bId) || (p.id === e.bId && q.id === e.aId); }
+  nextId() { return Math.max.apply(null, [0].concat(this.state.pieces.map(p => p.id))) + 1; }
+  parseMaterials(str) {
+    if (!str || str === '\u2014') return [{pct: '', name: ''}];
+    return String(str).split(/\s*\/\s*|,\s*/).map(tok => {
+      const m = tok.match(/^(\d+)%?\s*(.+)$/);
+      if (m) return {pct: m[1], name: m[2].trim()};
+      return {pct: '', name: tok.trim()};
+    });
+  }
+  materialsLabel(mats) {
+    const arr = (mats && mats.length) ? mats : [];
+    const parts = arr.filter(m => m && m.name).map(m => (m.pct ? m.pct + '% ' : '') + m.name);
+    return parts.length ? parts.join(' / ') : '\u2014';
+  }
+  setMaterialField(i, field, val) {
+    this.setState(s => {
+      const mats = (s.draft.materials || []).map((m, idx) => idx === i ? Object.assign({}, m, {[field]: val}) : m);
+      return {draft: Object.assign({}, s.draft, {materials: mats})};
+    });
+  }
+  addMaterial() { this.setState(s => ({draft: Object.assign({}, s.draft, {materials: (s.draft.materials || []).concat([{pct: '', name: ''}])})})); }
+  removeMaterial(i) { this.setState(s => { const mats = (s.draft.materials || []).slice(); if (mats.length > 1) mats.splice(i, 1); return {draft: Object.assign({}, s.draft, {materials: mats})}; }); }
+
+  checkOutfit(chosen) {
+    const items = Object.values(chosen).filter(Boolean).map(id => this.piece(id)).filter(Boolean);
+    const violations = []; let forced = 0;
+    const ex = this.state.exceptions;
+    for (let i = 0; i < items.length; i++) for (let j = i + 1; j < items.length; j++) {
+      const p = items[i], q = items[j];
+      const blockEx = ex.find(e => e.on && e.mode === 'block' && this.pairIs(e, p, q));
+      if (blockEx) { violations.push({rule: {label: blockEx.label}}); continue; }
+      const allowEx = ex.find(e => e.on && e.mode === 'allow' && this.pairIs(e, p, q));
+      if (allowEx) { forced++; continue; }
+      for (const r of this.state.rules) {
+        if (!r.on || r.kind !== 'color') continue;
+        if (this.matchPair(r, p, q)) violations.push({rule: r});
+      }
+    }
+    const fr = this.state.rules.find(r => r.kind === 'formality');
+    if (fr && fr.on && items.length) {
+      const fs = items.map(p => p.formality);
+      if (Math.max.apply(null, fs) - Math.min.apply(null, fs) > fr.threshold) violations.push({rule: fr});
+    }
+    return {ok: violations.length === 0, violations, forced};
+  }
+
+  freshPool(k) {
+    return this.state.pieces.filter(p => p.slot === k && this.daysAgo(p.lastWorn) >= this.state.recency);
+  }
+
+  generate() {
+    const st = this.state;
+    const slots = st.slots.filter(s => st.enabledSlots[s.key]).map(s => s.key);
+    const pool = {}; const shortReq = [];
+    for (const k of slots) {
+      pool[k] = this.freshPool(k);
+      if (pool[k].length === 0 && this.REQUIRED.includes(k)) shortReq.push(k);
+    }
+    let best = null;
+    for (let t = 0; t < 700; t++) {
+      const chosen = {};
+      for (const k of slots) {
+        if (st.locked[k] && st.outfit[k]) { chosen[k] = st.outfit[k]; continue; }
+        const pcs = pool[k];
+        chosen[k] = pcs.length ? pcs[(Math.random() * pcs.length) | 0].id : null;
+      }
+      const res = this.checkOutfit(chosen);
+      if (res.ok) { best = {chosen, res}; break; }
+      if (!best || res.violations.length < best.res.violations.length) best = {chosen, res};
+    }
+    this.setState({outfit: best ? best.chosen : {}}, () => this.applyStatus(shortReq));
+  }
+
+  applyStatus(shortReq) {
+    const res = this.checkOutfit(this.state.outfit);
+    const count = Object.values(this.state.outfit).filter(Boolean).length;
+    let s;
+    if (shortReq && shortReq.length) {
+      s = {ok: false, msg: 'Not enough fresh pieces', sub: 'Lower the recency window to free up ' + shortReq.map(k => this.slotLabel(k).toLowerCase()).join(', ') + '.'};
+    } else if (res.ok) {
+      s = {ok: true, msg: count + ' pieces \u00b7 all compatible', sub: res.forced ? 'Includes a forced pair \u00b7 clean across every active rule.' : 'Clean across every active rule \u00b7 nothing worn in ' + this.state.recency + ' days.'};
+    } else {
+      const v = res.violations[0];
+      s = {ok: false, msg: 'Best match still conflicts', sub: 'Couldn\u2019t avoid: ' + (v.rule ? v.rule.label.toLowerCase() : 'a blocked pair') + '.'};
+    }
+    this.setState({genStatus: s});
+  }
+
+  rerollSlot(k) {
+    const st = this.state;
+    if (!st.enabledSlots[k]) return;
+    const pcs = this.freshPool(k);
+    if (!pcs.length) { this.showToast('Nothing fresh for ' + this.slotLabel(k).toLowerCase()); return; }
+    const others = Object.assign({}, st.outfit); delete others[k];
+    const shuffled = pcs.slice().sort(() => Math.random() - 0.5);
+    let pick = shuffled.find(c => c.id !== st.outfit[k] && this.checkOutfit(Object.assign({}, others, {[k]: c.id})).ok)
+      || shuffled.find(c => this.checkOutfit(Object.assign({}, others, {[k]: c.id})).ok)
+      || shuffled.find(c => c.id !== st.outfit[k]) || shuffled[0];
+    this.setState({outfit: Object.assign({}, st.outfit, {[k]: pick.id})}, () => this.applyStatus([]));
+  }
+
+  toggleLock(k) {
+    if (!this.state.outfit[k]) return;
+    this.setState({locked: Object.assign({}, this.state.locked, {[k]: !this.state.locked[k]})});
+  }
+
+  toggleSlot(k) {
+    if (this.REQUIRED.includes(k)) { this.showToast(this.slotLabel(k) + ' is required'); return; }
+    const en = Object.assign({}, this.state.enabledSlots, {[k]: !this.state.enabledSlots[k]});
+    const outfit = Object.assign({}, this.state.outfit);
+    const locked = Object.assign({}, this.state.locked);
+    if (!en[k]) {
+      delete outfit[k]; delete locked[k];
+      this.setState({enabledSlots: en, outfit, locked}, () => this.applyStatus([]));
+    } else {
+      const pcs = this.freshPool(k).slice().sort(() => Math.random() - 0.5);
+      let pick = pcs.find(c => this.checkOutfit(Object.assign({}, outfit, {[k]: c.id})).ok) || pcs[0];
+      if (pick) outfit[k] = pick.id;
+      this.setState({enabledSlots: en, outfit}, () => this.applyStatus([]));
+    }
+  }
+
+  bumpRecency(d) {
+    const r = Math.max(0, Math.min(30, this.state.recency + d));
+    if (r === this.state.recency) return;
+    this.setState({recency: r}, () => this.generate());
+  }
+
+  logWorn() {
+    const ids = Object.values(this.state.outfit).filter(Boolean);
+    if (!ids.length) { this.showToast('Nothing to log'); return; }
+    const pieces = this.state.pieces.map(p => ids.indexOf(p.id) >= 0 ? Object.assign({}, p, {lastWorn: this.TODAY}) : p);
+    const entry = {id: 'l' + Date.now(), dateMs: this.TODAY, pieceIds: ids.slice()};
+    this.setState({pieces, log: [entry].concat(this.state.log), locked: {}}, () => {
+      this.showToast('Logged \u00b7 recency updated');
+      this.generate();
+    });
+  }
+
+  markWorn(id) {
+    const pieces = this.state.pieces.map(p => p.id === id ? Object.assign({}, p, {lastWorn: this.TODAY}) : p);
+    this.setState({pieces, detailId: null}, () => this.showToast('Marked as worn today'));
+  }
+
+  openLogDetail(id) { this.setState({logDetailId: id, logEditMode: false, logSwap: null}); }
+  toggleLogEdit() { this.setState(s => ({logEditMode: !s.logEditMode, logSwap: null})); }
+  startSwap(pieceId) { this.setState({logSwap: pieceId}); }
+  cancelSwap() { this.setState({logSwap: null}); }
+  doSwap(newId) {
+    const st = this.state;
+    const log = st.log.map(e => {
+      if (e.id !== st.logDetailId) return e;
+      return Object.assign({}, e, {pieceIds: e.pieceIds.map(pid => pid === st.logSwap ? newId : pid)});
+    });
+    this.setState({log, logSwap: null}, () => this.showToast('Item swapped'));
+  }
+
+  // ---- edit ----
+  toggleEdit() { this.setState({editMode: !this.state.editMode, sortOpen: false}); }
+  toggleRules() { this.setState({rulesOpen: !this.state.rulesOpen, sortOpen: false}); }
+  deleteRule(id) { this.setState({rules: this.state.rules.filter(r => r.id !== id)}, () => { this.applyStatus([]); this.showToast('Rule removed'); }); }
+  deleteException(id) { this.setState({exceptions: this.state.exceptions.filter(e => e.id !== id)}, () => { this.applyStatus([]); this.showToast('Exception removed'); }); }
+  toggleSort() { this.setState({sortOpen: !this.state.sortOpen}); }
+  selectSort(i) { this.setState({sortIdx: i, sortOpen: false}); }
+  openFilter() { this.setState({filterOpen: true}); }
+  closeFilter() { this.setState({filterOpen: false}); }
+  clearFilters() { this.setState({filterColor: null, filterFormality: null, filterCategory: null}); }
+  setFilter(field, val) { this.setState(s => ({[field]: s[field] === val ? null : val})); }
+
+  openAddItem() {
+    this.setState({editSheet: 'item', detailId: null, draft: {
+      id: null, slot: (this.state.slots[1] || this.state.slots[0]).key, name: '', category: '',
+      color: 'Black', colorKey: 'black', colors: ['black'], materials: [{pct: '', name: ''}], material: '', price: '', currency: '$', season: 'All-season',
+      formality: 2, lastWorn: this.TODAY - 30 * this.DAY, photo: null,
+    }});
+  }
+  openEditItem(p) {
+    this.setState({editSheet: 'item', detailId: null, draft: {
+      id: p.id, slot: p.slot, name: p.name, category: p.category, color: p.color,
+      colorKey: p.colorKey, colors: (p.colors && p.colors.length) ? p.colors.slice() : [p.colorKey], materials: (p.materials && p.materials.length) ? p.materials.map(m => Object.assign({}, m)) : this.parseMaterials(p.material), price: String(p.price), currency: p.currency || '$', season: p.season,
+      formality: p.formality, lastWorn: p.lastWorn, photo: p.photo || null,
+    }});
+  }
+  openAddSlot() { this.setState({editSheet: 'slot', slotDraftKey: null, slotDraftName: '', slotDraftGroup: 'Accessories'}); }
+  openEditSlot(slot) { this.setState({editSheet: 'slot', slotDraftKey: slot.key, slotDraftName: slot.label, slotDraftGroup: slot.group}); }
+  moveSlot(key, dir) {
+    const slots = this.state.slots.slice();
+    const i = slots.findIndex(s => s.key === key);
+    const j = i + dir;
+    if (i < 0 || j < 0 || j >= slots.length) return;
+    const t = slots[i]; slots[i] = slots[j]; slots[j] = t;
+    this.setState({slots}, () => this.generate());
+  }
+  deleteSlot() {
+    const key = this.state.slotDraftKey;
+    if (!key || this.REQUIRED.includes(key)) { this.showToast('That slot is required'); return; }
+    const slots = this.state.slots.filter(s => s.key !== key);
+    const pieces = this.state.pieces.filter(p => p.slot !== key);
+    const enabledSlots = Object.assign({}, this.state.enabledSlots); delete enabledSlots[key];
+    const outfit = Object.assign({}, this.state.outfit); delete outfit[key];
+    const locked = Object.assign({}, this.state.locked); delete locked[key];
+    this.setState({slots, pieces, enabledSlots, outfit, locked, editSheet: null, slotDraftKey: null}, () => {
+      this.showToast('Slot removed');
+      this.generate();
+    });
+  }
+  closeSheet() { this.setState({editSheet: null, draft: null}); }
+  setDraft(field, val) { this.setState(s => ({draft: Object.assign({}, s.draft, {[field]: val})})); }
+  onPhotoFile(e) {
+    const file = e.target && e.target.files && e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => this.setDraft('photo', ev.target.result);
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  }
+
+  saveItem() {
+    const d = this.state.draft;
+    const mats = (d.materials || []).filter(m => m && m.name && m.name.trim());
+    const missing = [];
+    if (!d.name.trim()) missing.push('name');
+    if (!(d.category || '').trim()) missing.push('category');
+    if (!d.slot) missing.push('outfit slot');
+    if (!(d.colors && d.colors.length)) missing.push('color');
+    if (!mats.length || (d.materials || []).some(m => !m.name.trim() || !String(m.pct).trim())) missing.push('material');
+    if (!String(d.price).trim()) missing.push('price');
+    if (!d.formality) missing.push('formality');
+    if (missing.length) { this.showToast('Fill in: ' + missing.join(', ')); return; }
+    const cat = (d.category || '').trim();
+    const history = cat && !this.state.categoryHistory.includes(cat)
+      ? this.state.categoryHistory.concat([cat]) : this.state.categoryHistory;
+    const matHistory = this.state.materialHistory.slice();
+    mats.forEach(m => { const n = m.name.trim(); if (n && !matHistory.some(x => x.toLowerCase() === n.toLowerCase())) matHistory.push(n); });
+    const price = parseInt(d.price, 10) || 0;
+    const cleanMats = mats.map(m => ({pct: String(m.pct).trim(), name: m.name.trim()}));
+    const base = {
+      id: d.id != null ? d.id : this.nextId(), slot: d.slot, name: d.name.trim(),
+      category: cat, color: (d.colors||[d.colorKey]).map(k => this.colorLabel(k)).join(', '), colorKey: (d.colors && d.colors[0]) || d.colorKey, colors: (d.colors && d.colors.length) ? d.colors.slice() : [d.colorKey],
+      materials: cleanMats, material: this.materialsLabel(cleanMats), price, currency: d.currency || '$', season: d.season,
+      formality: d.formality, lastWorn: d.lastWorn, photo: d.photo || null,
+    };
+    let pieces;
+    if (d.id != null) pieces = this.state.pieces.map(p => p.id === d.id ? base : p);
+    else pieces = this.state.pieces.concat([base]);
+    this.setState({pieces, categoryHistory: history, materialHistory: matHistory, editSheet: null, draft: null}, () => this.showToast(d.id != null ? 'Item updated' : 'Item added'));
+  }
+
+  deleteItem() {
+    const d = this.state.draft;
+    const pieces = this.state.pieces.filter(p => p.id !== d.id);
+    const outfit = Object.assign({}, this.state.outfit);
+    Object.keys(outfit).forEach(k => { if (outfit[k] === d.id) delete outfit[k]; });
+    this.setState({pieces, outfit, editSheet: null, draft: null}, () => this.showToast('Item deleted'));
+  }
+
+  saveSlot() {
+    const name = (this.state.slotDraftName || '').trim();
+    if (!name) { this.showToast('Name the slot'); return; }
+    const group = this.state.slotDraftGroup || 'Accessories';
+    if (this.state.slotDraftKey) {
+      const slots = this.state.slots.map(s => s.key === this.state.slotDraftKey ? Object.assign({}, s, {label: name, group}) : s);
+      this.setState({slots, editSheet: null, slotDraftKey: null}, () => this.showToast('Slot updated'));
+      return;
+    }
+    const key = 's_' + name.toLowerCase().replace(/[^a-z0-9]+/g, '_') + '_' + Date.now().toString(36).slice(-3);
+    const slot = {key, label: name, group};
+    this.setState({
+      slots: this.state.slots.concat([slot]),
+      enabledSlots: Object.assign({}, this.state.enabledSlots, {[key]: false}),
+      editSheet: null, slotDraftKey: null, slotDraftName: '',
+    }, () => this.showToast('Slot \u201c' + name + '\u201d added'));
+  }
+
+  showToast(msg) {
+    clearTimeout(this._t);
+    this.setState({toast: msg});
+    this._t = setTimeout(() => this.setState({toast: null}), 2200);
+  }
+
+  wornLabel(ms) {
+    const d = this.daysAgo(ms);
+    if (d <= 0) return 'Worn today';
+    if (d === 1) return 'Yesterday';
+    if (d < 7) return d + 'd ago';
+    if (d < 14) return '1w ago';
+    if (d < 30) return Math.floor(d / 7) + 'w ago';
+    return Math.floor(d / 30) + 'mo ago';
+  }
+
+  fmtDate(ms) {
+    const dt = new Date(ms);
+    return this.months[dt.getMonth()] + ' ' + dt.getDate() + ', ' + dt.getFullYear();
+  }
+
+  dots(formality) {
+    const out = [];
+    for (let i = 0; i < 3; i++) out.push({color: i < formality ? '#17171B' : '#DEDEE2'});
+    return out;
+  }
+  priceStr(p) { return (p.currency || '$') + p.price; }
+  formalityFull(f) { return this.formalityLabels[f] || ''; }
+  openAddRule() { this.setState({editSheet: 'rule', rulePickA: null, ruleIncompat: [], ruleFilter: 'All', ruleSearch: '', detailId: null}); }
+  pickRulePiece(id) {
+    const st = this.state;
+    if (!st.rulePickA) { this.setState({rulePickA: id}); return; }
+    if (id === st.rulePickA) return;
+    const cur = (st.ruleIncompat || []).slice();
+    const i = cur.indexOf(id);
+    if (i >= 0) cur.splice(i, 1); else cur.push(id);
+    this.setState({ruleIncompat: cur});
+  }
+  resetRuleAnchor() { this.setState({rulePickA: null, ruleIncompat: []}); }
+  createRule() {
+    const st = this.state;
+    const a = this.piece(st.rulePickA);
+    const picks = (st.ruleIncompat || []);
+    if (!a || !picks.length) { this.showToast('Choose an item and what it clashes with'); return; }
+    const existing = st.exceptions.slice();
+    let added = 0;
+    picks.forEach(bId => {
+      const dup = existing.some(e => (e.aId === a.id && e.bId === bId) || (e.aId === bId && e.bId === a.id));
+      if (!dup) { existing.push({id: 'x' + Date.now() + '_' + bId, mode: 'block', on: true, aId: a.id, bId: bId}); added++; }
+    });
+    this.setState({exceptions: existing, editSheet: null, rulePickA: null, ruleIncompat: []}, () => {
+      this.showToast(added + (added === 1 ? ' rule added' : ' rules added'));
+      this.applyStatus([]);
+    });
+  }
+
+  renderVals() {
+    const st = this.state;
+    const tab = st.tab;
+    const ink = '#17171B', mute = '#BFC1C7';
+
+    const headers = {
+      closet: {k: '', t: st.editMode ? 'Edit mode' : 'Wardrobe'},
+      generate: {k: '', t: st.rulesOpen ? 'Rules' : "Today's fit"},
+      log: {k: '', t: 'Outfit log'},
+    };
+    const chipStyle = (active) => active
+      ? {bg: ink, fg: '#fff', border: ink}
+      : {bg: '#F2F2F4', fg: '#5B5D63', border: 'transparent'};
+
+    // closet
+    const groupKeys = ['All'].concat(this.closetGroups);
+    const groups = groupKeys.map(g => {
+      const active = st.catFilter === g;
+      return {label: g, bg: active ? ink : '#fff', fg: active ? '#fff' : '#5B5D63',
+        border: active ? ink : '#E8E8EC', onClick: () => this.setState({catFilter: g})};
+    });
+    let filtered = st.pieces.slice();
+    if (st.catFilter !== 'All') filtered = filtered.filter(p => this.slotGroup(p.slot) === st.catFilter);
+    if (st.filterColor) filtered = filtered.filter(p => (p.colors || [p.colorKey]).indexOf(st.filterColor) >= 0);
+    if (st.filterFormality) filtered = filtered.filter(p => p.formality === st.filterFormality);
+    if (st.filterCategory) filtered = filtered.filter(p => p.category === st.filterCategory);
+    filtered.sort((a, b) => b.formality - a.formality);
+    const cards = filtered.map(p => ({
+      id: p.id, name: p.name,
+      colorTag: (p.color || '').toUpperCase(),
+      colorHex: this.colorHex[p.colorKey] || '#C9CBD1',
+      colorDots: this.colorDots(p),
+      photo: p.photo || '', hasPhoto: !!p.photo,
+      photoNode: p.photo ? React.createElement('img', {src: p.photo, style: {position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover'}}) : null,
+      sub: this.priceStr(p) + ' \u00b7 ' + p.material,
+      wornLabel: this.wornLabel(p.lastWorn),
+      onOpen: st.editMode ? () => this.openEditItem(p) : () => this.setState({detailId: p.id}),
+    }));
+    const closetCount = filtered.length + (filtered.length === 1 ? ' piece' : ' pieces');
+    const slotRows = st.slots.map((s, i) => {
+      const first = i === 0, last = i === st.slots.length - 1;
+      const req = this.REQUIRED.includes(s.key);
+      const count = st.pieces.filter(p => p.slot === s.key).length;
+      return {
+        label: s.label,
+        sub: s.group + ' \u00b7 ' + count + (count === 1 ? ' piece' : ' pieces'),
+        tag: req ? 'REQUIRED' : 'OPTIONAL',
+        tagBg: req ? '#EEF1F6' : '#F2F2F4',
+        tagColor: req ? '#5B6B8C' : '#9A9CA2',
+        sep: last ? 'transparent' : '#F2F2F4',
+        upBg: first ? '#F7F7F9' : '#F1F1F4', upColor: first ? '#D4D6DB' : '#5B5D63',
+        downBg: last ? '#F7F7F9' : '#F1F1F4', downColor: last ? '#D4D6DB' : '#5B5D63',
+        onUp: () => this.moveSlot(s.key, -1),
+        onDown: () => this.moveSlot(s.key, 1),
+        onEdit: () => this.openEditSlot(s),
+      };
+    });
+    const filterColorChips = this.colorList.map(c => ({
+      hex: this.colorHex[c.key], label: c.label,
+      ring: st.filterColor === c.key ? '0 0 0 2px #fff, 0 0 0 4px #17171B' : '0 0 0 0.5px rgba(0,0,0,0.14)',
+      onClick: () => this.setFilter('filterColor', c.key),
+    }));
+    const filterFormChips = [1,2,3].map(n => {
+      const active = st.filterFormality === n;
+      return {label: this.formalityLabels[n], bg: active ? ink : '#fff', fg: active ? '#fff' : '#5B5D63', border: active ? ink : '#E2E2E6', onClick: () => this.setFilter('filterFormality', n)};
+    });
+    const allCategories = Array.from(new Set(st.pieces.map(p => p.category).filter(Boolean))).sort();
+    const filterCatChips = allCategories.map(cat => {
+      const active = st.filterCategory === cat;
+      return {label: cat, bg: active ? ink : '#fff', fg: active ? '#fff' : '#5B5D63', border: active ? ink : '#E2E2E6', onClick: () => this.setFilter('filterCategory', cat)};
+    });
+    const filterCount = (st.filterColor ? 1 : 0) + (st.filterFormality ? 1 : 0) + (st.filterCategory ? 1 : 0);
+
+    // detail
+    let detail = null;
+    if (st.detailId != null) {
+      const p = this.piece(st.detailId);
+      if (p) detail = {
+        name: p.name, colorTag: (p.color || '').toUpperCase(),
+        colorHex: this.colorHex[p.colorKey] || '#C9CBD1',
+        photo: p.photo || '', hasPhoto: !!p.photo,
+        photoNode: p.photo ? React.createElement('img', {src: p.photo, style: {position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover'}}) : null,
+        subline: this.slotLabel(p.slot),
+        meta: [
+          {label: 'Category', value: p.category},
+          {label: 'Color', value: this.colorsLabel(p)},
+          {label: 'Material', value: p.material},
+          {label: 'Price', value: this.priceStr(p)},
+          {label: 'Formality', value: this.formalityFull(p.formality)},
+          {label: 'Last worn', value: this.wornLabel(p.lastWorn) + ' \u00b7 ' + this.fmtDate(p.lastWorn)},
+        ],
+        onClose: () => this.setState({detailId: null}),
+        onWorn: () => this.markWorn(p.id),
+        onEdit: () => this.openEditItem(p),
+      };
+    }
+
+    // edit draft
+    const d = st.draft || {};
+    const setDraft = (f, v) => this.setDraft(f, v);
+    const draftSlotChips = st.slots.map(s => {
+      const cs = chipStyle(d.slot === s.key);
+      return {label: s.label, bg: cs.bg, fg: cs.fg, border: cs.border, onClick: () => setDraft('slot', s.key)};
+    });
+    const draftColorChips = this.colorList.map(c => {
+      const active = (d.colors || []).indexOf(c.key) >= 0;
+      return {hex: this.colorHex[c.key], label: c.label,
+        onClick: () => this.toggleDraftColor(c.key),
+        ring: active ? '0 0 0 2px #fff, 0 0 0 4px #17171B' : '0 0 0 0.5px rgba(0,0,0,0.14)'};
+    });
+    const draftCurrencyChips = this.currencies.map(sym => {
+      const active = (d.currency || '$') === sym;
+      return {symbol: sym, bg: active ? ink : 'transparent', fg: active ? '#fff' : '#9A9CA2', onClick: () => setDraft('currency', sym)};
+    });
+    const draftFormChips = [1,2,3].map(n => {
+      const active = (d.formality || 0) === n;
+      return {label: this.formalityLabels[n], bg: active ? ink : '#fff', fg: active ? '#fff' : '#5B5D63', border: active ? ink : '#E2E2E6', onClick: () => setDraft('formality', n)};
+    });
+
+    const knownCats = Array.from(new Set(st.pieces.map(p => p.category).concat(st.categoryHistory).filter(Boolean)));
+    const catSuggestions = (d.category || '').length > 0
+      ? knownCats
+          .filter(c => c.toLowerCase().startsWith((d.category||'').toLowerCase()) && c.toLowerCase() !== (d.category||'').toLowerCase())
+          .slice(0, 4)
+          .map(c => ({label: c, onSelect: () => setDraft('category', c)}))
+      : null;
+    const slotGroupChips = this.closetGroups.map(g => {
+      const active = st.slotDraftGroup === g; const cs = chipStyle(active);
+      return {label: g, bg: cs.bg, fg: cs.fg, border: cs.border, onClick: () => this.setState({slotDraftGroup: g})};
+    });
+
+    // generator
+    const gs = st.genStatus || {ok: true, msg: 'Ready', sub: 'Tap shuffle to generate a fit.'};
+    const outfitRows = st.slots.filter(s => st.enabledSlots[s.key]).map(s => {
+      const k = s.key; const id = st.outfit[k]; const p = id ? this.piece(id) : null;
+      const locked = !!st.locked[k];
+      if (!p) {
+        return {slotLabel: s.label, name: 'Nothing fresh', sub: 'Widen recency or shuffle',
+          nameColor: '#B0B2B8', thumbBg: '#F4F4F6', thumbTag: '', colorHex: 'transparent',
+          opacity: '0.75', lockLabel: 'Lock', lockBg: '#F2F2F4', lockColor: '#C4C6CC',
+          onLock: () => {}, onReroll: () => this.rerollSlot(k)};
+      }
+      return {slotLabel: s.label, name: p.name, sub: p.color + ' \u00b7 ' + this.formalityLabels[p.formality],
+        nameColor: '#17171B', thumbBg: '#EEEEF1', thumbTag: (p.color || '').toUpperCase(),
+        colorHex: this.colorHex[p.colorKey] || '#C9CBD1', opacity: '1',
+        lockLabel: locked ? 'Locked' : 'Lock', lockBg: locked ? ink : '#F2F2F4', lockColor: locked ? '#fff' : '#8C8E94',
+        onLock: () => this.toggleLock(k), onReroll: () => this.rerollSlot(k)};
+    });
+    const slotToggles = st.slots.map(s => {
+      const k = s.key; const on = !!st.enabledSlots[k]; const req = this.REQUIRED.includes(k);
+      return {label: s.label,
+        bg: on ? (req ? '#EFEFF2' : ink) : '#fff',
+        fg: on ? (req ? '#9A9CA2' : '#fff') : '#9A9CA2',
+        border: on ? (req ? '#EFEFF2' : ink) : '#E8E8EC',
+        onToggle: () => this.toggleSlot(k)};
+    });
+    const genColors = gs.ok
+      ? {bg: '#EAF6EF', border: '#CDE8D7', dot: '#2FA968', text: '#1E6B45', glyph: '\u2713'}
+      : {bg: '#FCEFEE', border: '#F4D7D9', dot: '#D0556B', text: '#9E3B4D', glyph: '!'};
+
+    // log — most recent 7 days, fixed (no scroll)
+    const logEntries = st.log.slice(0, 7).map(e => {
+      const dd = this.daysAgo(e.dateMs);
+      const pcs = e.pieceIds.map(id => this.piece(id)).filter(Boolean);
+      const avg = Math.round(pcs.reduce((s, p) => s + p.formality, 0) / Math.max(1, pcs.length));
+      const dt = new Date(e.dateMs);
+      let weekday = this.weekdays[dt.getDay()];
+      if (dd <= 0) weekday = 'Today'; else if (dd === 1) weekday = 'Yesterday';
+      return {
+        id: e.id, weekday,
+        dateLabel: this.months[dt.getMonth()] + ' ' + dt.getDate(),
+        formalityLabel: this.formalityLabels[avg] || '',
+        swatches: pcs.slice(0, 5).map((p, i) => {
+          const extra = (i === 4 && pcs.length > 5) ? '+' + (pcs.length - 4) : '';
+          return {hex: extra ? '#3A3A40' : (this.colorHex[p.colorKey] || '#C9CBD1'), ml: i === 0 ? '0px' : '-9px', extra, extraColor: '#fff'};
+        }),
+        onOpen: () => this.openLogDetail(e.id),
+      };
+    });
+
+    // log detail
+    let logDetail = null;
+    if (st.logDetailId != null) {
+      const e = st.log.find(x => x.id === st.logDetailId);
+      if (e) {
+        const pcs = e.pieceIds.map(id => this.piece(id)).filter(Boolean);
+        const dd = this.daysAgo(e.dateMs);
+        const dt = new Date(e.dateMs);
+        let weekday = this.weekdays[dt.getDay()];
+        if (dd <= 0) weekday = 'Today'; else if (dd === 1) weekday = 'Yesterday';
+        const total = pcs.reduce((s, p) => s + p.price, 0);
+        const cur = (pcs[0] && pcs[0].currency) || '$';
+        logDetail = {
+          weekday,
+          dateLabel: this.months[dt.getMonth()] + ' ' + dt.getDate() + ', ' + dt.getFullYear(),
+          isEditing: st.logEditMode ? true : null,
+          editLabel: st.logEditMode ? 'Done' : 'Edit',
+          editBg: st.logEditMode ? ink : '#F2F2F4',
+          editColor: st.logEditMode ? '#fff' : '#17171B',
+          onToggleEdit: () => this.toggleLogEdit(),
+          items: pcs.map(p => ({
+            name: p.name, slotLabel: this.slotLabel(p.slot),
+            colorHex: this.colorHex[p.colorKey] || '#C9CBD1',
+            photoNode: p.photo ? React.createElement('img', {src: p.photo, style: {position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover'}}) : null,
+            hasPhoto: !!p.photo,
+            formalityLabel: this.formalityLabels[p.formality] || '',
+            priceLabel: this.priceStr(p),
+            priceShow: st.logEditMode ? null : true,
+            onSwap: () => this.startSwap(p.id),
+          })),
+          totalLabel: cur + total,
+          countLabel: pcs.length + (pcs.length === 1 ? ' piece' : ' pieces'),
+          onClose: () => this.setState({logDetailId: null, logEditMode: false, logSwap: null}),
+        };
+        if (st.logSwap != null) {
+          const sp = this.piece(st.logSwap);
+          if (sp) {
+            logDetail.swap = {
+              title: 'Swap ' + sp.name,
+              slotLabel: this.slotLabel(sp.slot),
+              onCancel: () => this.cancelSwap(),
+              options: st.pieces.filter(o => o.slot === sp.slot && o.id !== sp.id).map(o => ({
+                name: o.name,
+                slotLabel: this.colorsLabel(o),
+                colorHex: this.colorHex[o.colorKey] || '#C9CBD1',
+                photoNode: o.photo ? React.createElement('img', {src: o.photo, style: {position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover'}}) : null,
+                hasPhoto: !!o.photo,
+                onPick: () => this.doSwap(o.id),
+              })),
+            };
+          }
+        }
+      }
+    }
+
+    // rules — user-defined incompatible pairs only
+    const ruleRows = st.exceptions.map((x, i) => {
+      const a = this.piece(x.aId), b = this.piece(x.bId);
+      return {
+        aName: a ? a.name : '?', bName: b ? b.name : '?',
+        sep: i === st.exceptions.length - 1 ? 'transparent' : '#F2F2F4',
+        onDelete: () => this.deleteException(x.id),
+      };
+    });
+    const noRules = st.exceptions.length ? null : true;
+
+    const ruleSlotChips = [{key:'All',label:'All'}].concat(st.slots.map(s=>({key:s.key,label:s.label}))).map(o => {
+      const active = (st.ruleFilter||'All') === o.key;
+      return {label: o.label, bg: active ? ink : '#fff', fg: active ? '#fff' : '#5B5D63', border: active ? ink : '#E8E8EC', onClick: () => this.setState({ruleFilter: o.key})};
+    });
+    const ruleSearch = st.ruleSearch || '';
+    const aP = st.rulePickA ? this.piece(st.rulePickA) : null;
+    const incompat = st.ruleIncompat || [];
+    let rule = null;
+    if (st.editSheet === 'rule') {
+      rule = {
+        hasAnchor: aP ? true : null,
+        noAnchor: aP ? null : true,
+        anchorName: aP ? aP.name : '',
+        anchorSlot: aP ? this.slotLabel(aP.slot) : '',
+        anchorHex: aP ? (this.colorHex[aP.colorKey] || '#C9CBD1') : 'transparent',
+        prompt: aP ? 'Now pick everything it can\u2019t be worn with' : 'Choose an item to start',
+        countLabel: incompat.length ? (incompat.length + ' selected') : '',
+        onResetAnchor: () => this.resetRuleAnchor(),
+        pieces: st.pieces
+          .filter(p => !aP || p.id !== aP.id)
+          .filter(p => (st.ruleFilter||'All') === 'All' || p.slot === st.ruleFilter)
+          .filter(p => !ruleSearch || p.name.toLowerCase().includes(ruleSearch.toLowerCase()) || p.category.toLowerCase().includes(ruleSearch.toLowerCase()))
+          .map(p => {
+          const sel = incompat.indexOf(p.id) >= 0;
+          return {
+            name: p.name, slotLabel: this.slotLabel(p.slot),
+            colorTag: (p.color || '').toUpperCase(),
+            colorHex: this.colorHex[p.colorKey] || '#C9CBD1',
+            rowBg: sel ? '#F4F4F6' : '#fff',
+            rowBorder: sel ? ink : '#EDEDF0',
+            check: sel ? '\u2713' : '',
+            onPick: () => this.pickRulePiece(p.id),
+          };
+        }),
+        createBg: (aP && incompat.length) ? ink : '#C9CBD1',
+        createLabel: (aP && incompat.length > 1) ? ('Create ' + incompat.length + ' rules') : 'Create rule',
+        onCreate: () => this.createRule(),
+        onCancel: () => this.closeSheet(),
+      };
+    }
+
+    const onLight = {bg: '#fff', color: '#17171B', border: '#E2E2E6'};
+    const onDark = {bg: ink, color: '#fff', border: ink};
+    let headerBtn = null;
+    if (tab === 'closet') headerBtn = Object.assign({label: st.editMode ? 'Done' : 'Edit', onClick: () => this.toggleEdit()}, st.editMode ? onDark : onLight);
+    else if (tab === 'generate') headerBtn = Object.assign({label: st.rulesOpen ? 'Done' : 'Rules', onClick: () => this.toggleRules()}, st.rulesOpen ? onDark : onLight);
+
+    const draft = st.draft || {};
+    const draftColorDots = (draft.colors && draft.colors.length ? draft.colors : [draft.colorKey]).slice(0, 2).map(k => ({hex: this.colorHex[k] || '#C9CBD1'}));
+    const knownMats = Array.from(new Set((this.materialNames || []).concat(st.materialHistory || [])));
+    const draftMaterials = (draft.materials || []).map((m, i) => {
+      const q = (m.name || '').trim().toLowerCase();
+      const sugg = q.length > 0
+        ? knownMats.filter(n => n.toLowerCase().startsWith(q) && n.toLowerCase() !== q).slice(0, 4).map(n => ({label: n, onSelect: () => this.setMaterialField(i, 'name', n)}))
+        : null;
+      return {
+        pct: m.pct || '', name: m.name || '',
+        nameSuggestions: sugg,
+        showRemove: (draft.materials || []).length > 1 ? true : null,
+        onPct: (e) => this.setMaterialField(i, 'pct', e.target.value.replace(/[^0-9]/g, '')),
+        onName: (e) => this.setMaterialField(i, 'name', e.target.value),
+        onRemove: () => this.removeMaterial(i),
+      };
+    });
+
+    return {
+      headerTitle: headers[tab].t,
+      isCloset: tab === 'closet',
+      isGenerate: tab === 'generate' && !st.rulesOpen,
+      isLog: tab === 'log',
+      isRules: tab === 'generate' && st.rulesOpen,
+      goCloset: () => this.setState({tab: 'closet', rulesOpen: false, sortOpen: false}),
+      goGenerate: () => this.setState({tab: 'generate', rulesOpen: false, sortOpen: false}),
+      goLog: () => this.setState({tab: 'log', rulesOpen: false, sortOpen: false}),
+      tColCloset: tab === 'closet' ? ink : mute,
+      tColGenerate: tab === 'generate' ? ink : mute,
+      tColLog: tab === 'log' ? ink : mute,
+
+      headerBtnShow: !!headerBtn,
+      headerBtnLabel: headerBtn ? headerBtn.label : '',
+      headerBtnBg: headerBtn ? headerBtn.bg : '#fff',
+      headerBtnColor: headerBtn ? headerBtn.color : ink,
+      headerBtnBorder: headerBtn ? headerBtn.border : '#E2E2E6',
+      headerBtnClick: headerBtn ? headerBtn.onClick : () => {},
+      editMode: st.editMode,
+      notEditMode: !st.editMode,
+
+      isGridView: st.closetView === 'grid',
+      isListView: st.closetView === 'list',
+      setGridView: () => this.setState({closetView: 'grid'}),
+      setListView: () => this.setState({closetView: 'list'}),
+      gridBtnBg: st.closetView === 'grid' ? ink : 'transparent',
+      gridBtnColor: st.closetView === 'grid' ? '#fff' : '#A6A8AE',
+      listBtnBg: st.closetView === 'list' ? ink : 'transparent',
+      listBtnColor: st.closetView === 'list' ? '#fff' : '#A6A8AE',
+
+      groups, cards, closetCount,
+      filterCount, filterColorChips, filterFormChips, filterCatChips,
+      hasCategories: filterCatChips.length ? true : null,
+      filterOpen: st.filterOpen ? true : null,
+      filterBtnBg: filterCount ? ink : '#fff',
+      filterBtnColor: filterCount ? '#fff' : '#17171B',
+      filterBtnIcon: filterCount ? '#fff' : '#17171B',
+      filterBadge: filterCount ? String(filterCount) : '',
+      openFilter: () => this.openFilter(),
+      closeFilter: () => this.closeFilter(),
+      clearFilters: () => this.clearFilters(),
+
+      onAddItem: () => this.openAddItem(),
+      onAddSlot: () => this.openAddSlot(),
+
+      detail,
+      stopProp: (e) => e.stopPropagation(),
+
+      editItem: st.editSheet === 'item' ? true : null,
+      editSlot: st.editSheet === 'slot' ? true : null,
+      draftTitle: draft.id != null ? 'Edit item' : 'Add item',
+      saveLabel: draft.id != null ? 'Save changes' : 'Add to closet',
+      canDelete: draft.id != null,
+      draftName: draft.name || '',
+      draftCategory: draft.category || '',
+      draftMaterials,
+      onAddMaterial: () => this.addMaterial(),
+      draftPrice: draft.price || '',
+      draftColorTag: (draft.color || '').toUpperCase(),
+      draftColorHex: this.colorHex[draft.colorKey] || '#C9CBD1',
+      draftColorDots,
+      draftPhoto: draft.photo || '', draftHasPhoto: !!draft.photo,
+      draftPhotoNode: draft.photo ? React.createElement('img', {src: draft.photo, style: {position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover'}}) : null,
+      photoBtnLabel: draft.photo ? 'Change photo' : 'Add photo',
+      onPhotoFile: (e) => this.onPhotoFile(e),
+      onRemovePhoto: (e) => { if (e) e.stopPropagation(); this.setDraft('photo', null); },
+      draftSlotChips, draftColorChips, draftCurrencyChips, draftFormChips,
+      catSuggestions,
+      onCatSuggest: (v) => setDraft('category', v),
+      onDraftName: (e) => setDraft('name', e.target.value),
+      onDraftCategory: (e) => setDraft('category', e.target.value),
+      onDraftPrice: (e) => setDraft('price', e.target.value.replace(/[^0-9]/g, '')),
+      onSaveItem: () => this.saveItem(),
+      onDeleteItem: () => this.deleteItem(),
+      onCancelEdit: () => this.closeSheet(),
+
+      slotRows,
+      slotName: st.slotDraftName, slotGroupChips,
+      slotSheetTitle: st.slotDraftKey ? 'Edit slot' : 'New outfit slot',
+      slotSaveLabel: st.slotDraftKey ? 'Save changes' : 'Add slot',
+      canDeleteSlot: (st.slotDraftKey && !this.REQUIRED.includes(st.slotDraftKey)) ? true : null,
+      onDeleteSlot: () => this.deleteSlot(),
+      onSlotName: (e) => this.setState({slotDraftName: e.target.value}),
+      onSaveSlot: () => this.saveSlot(),
+      onCancelSlot: () => this.closeSheet(),
+
+      recency: st.recency,
+      recencyLabel: 'Hides anything worn in the last ' + st.recency + ' days',
+      decRecency: () => this.bumpRecency(-1),
+      incRecency: () => this.bumpRecency(1),
+      outfitRows, slotToggles,
+      genBg: genColors.bg, genBorder: genColors.border, genDot: genColors.dot,
+      genText: genColors.text, genGlyph: genColors.glyph,
+      genMsg: gs.msg, genSub: gs.sub,
+      onShuffle: () => this.generate(),
+      onLog: () => this.logWorn(),
+
+      logEntries, logDetail, ruleRows, noRules,
+      onAddRule: () => this.openAddRule(),
+      rulePicker: st.editSheet === 'rule' ? true : null,
+      ruleSlotChips, ruleSearch,
+      onRuleSearch: (e) => this.setState({ruleSearch: e.target.value}),
+      rule,
+
+      toast: st.toast,
+    };
+  }
+}
+</script>
+</body>
+</html>
